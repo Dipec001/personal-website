@@ -1,0 +1,72 @@
+---
+title: "API Gateway Latency Spikes Every 30 Minutes Like Clockwork"
+description: "If your latency spikes happen randomly, it's something else. If they happen every 25–30 minutes during low traffic, it's almost certainly Lambda cold starts."
+date: "2026-04-04"
+series: "aws-daily-with-divine"
+tags: ["aws", "lambda", "cold-starts", "serverless", "performance"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-lambda-devops-activity-7443205245427417088-uAra"
+---
+
+Have you ever been a victim of AWS Lambda scaling to zero without knowing it was the cause of your latency issues?
+
+Here's what's actually happening — and how to tell.
+
+## Lambda scales to zero
+
+AWS Lambda automatically scales down to zero when there are no invocations. Functions that haven't been invoked for **roughly 15 to 30 minutes** get their execution environment shut down entirely.
+
+The next invocation has to spin up a fresh environment, download the code, initialize the runtime, and run any initialization code in your function. That startup time is the **cold start**.
+
+For simple Node or Python functions it might be 200–500ms. For Java or large packages, it can be **several seconds.**
+
+## How to diagnose it
+
+This is the part most engineers miss while spending hours blaming the wrong thing.
+
+- **Latency spikes random or under heavy load?** It's probably something else.
+- **Latency spikes like clockwork every 25–30 minutes during low traffic periods?** It's almost certainly cold starts from your function scaling to zero.
+
+> The 30-minute pattern is the giveaway.
+
+## Two fixes, depending on your situation
+
+### Provisioned concurrency
+
+Tell Lambda to keep a certain number of execution environments initialized and ready at all times so they never scale to zero. The first request always hits a warm environment with no cold start.
+
+You pay for those environments even when they're idle, but you eliminate the latency spike completely.
+
+```bash
+aws lambda put-provisioned-concurrency-config \
+  --function-name my-function \
+  --qualifier prod \
+  --provisioned-concurrent-executions 5
+```
+
+### Scheduled warmer
+
+Simpler alternative. A CloudWatch Events / EventBridge rule that pings your Lambda every 10 minutes keeps it warm without paying for provisioned concurrency.
+
+```bash
+aws events put-rule \
+  --name lambda-warmer \
+  --schedule-expression "rate(10 minutes)"
+
+aws events put-targets \
+  --rule lambda-warmer \
+  --targets "Id"="1","Arn"="arn:aws:lambda:..."
+```
+
+Works well for low-traffic functions where you just need to prevent scale-to-zero without committing to reserved capacity.
+
+## Which to pick
+
+| Provisioned concurrency | Scheduled warmer |
+|---|---|
+| Predictable cost, predictable latency | Cheaper, slightly less reliable |
+| Right for production-critical paths | Right for internal tools, low-traffic functions |
+| Pay even when idle | Pay only per invocation |
+
+---
+
+Check your latency spikes before blaming anything else. Have you dealt with Lambda cold starts before? How did you solve it?

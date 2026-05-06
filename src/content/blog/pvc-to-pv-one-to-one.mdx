@@ -1,0 +1,63 @@
+---
+title: "PVC to PV Is a One-to-One Relationship — Here's What That Means in Production"
+description: "Two storage behaviors catch people completely off guard in production: the sizing trap, and the Released state trap. Know both before they bite you."
+date: "2026-04-03"
+series: "k8s-with-divine"
+tags: ["kubernetes", "storage", "persistent-volumes", "cka"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7442843004928933888-aSmS"
+---
+
+PVs and PVCs — fully known as **Persistent Volumes** and **Persistent Volume Claims** — are storage volumes allocated for your cluster, and claims for those storage volumes by your workloads.
+
+But if that's all you know about them, you're in for trouble sooner or later.
+
+The concept seems straightforward: create a PV, claim it with a PVC, attach it to a pod. Simple. **Two behaviors catch people completely off guard in production.**
+
+## The sizing trap
+
+Say you have a 100GB PV and you create a PVC requesting 10GB. Kubernetes binds that PVC to the 100GB PV because it's the best available match.
+
+Now that **entire 100GB PV is locked to your 10GB claim** and no other PVC can use the remaining 90GB. It's completely unavailable to the rest of the cluster.
+
+So you can have a situation where you have plenty of storage provisioned but new PVCs can't bind — because every PV is already claimed, even if most of that storage is sitting unused.
+
+> PVC ⟷ PV is one-to-one. Not one-to-storage-by-size.
+
+## The Released state trap
+
+There are three reclaim policies you need to know:
+
+- **Retain** — when the PVC is deleted, the PV stays but enters `Released` state and **cannot be claimed by another PVC**.
+- **Delete** — the PV is also deleted when the PVC is deleted.
+- **Recycle** — the PV is wiped and made `Available` again for a new claim. (Deprecated, don't rely on it.)
+
+`Retain` is the most common in production because you don't want storage silently deleted. But here's where most engineers get caught.
+
+When you delete a PVC, the PV goes into `Released` state which **looks available but isn't.** It still holds a reference to the old claim in its spec, and a new PVC cannot bind to a `Released` PV until an admin manually clears that reference.
+
+Most engineers see `Released` and assume it's available. It isn't.
+
+## How to clear a Released PV
+
+```bash
+# See current PV states across the cluster
+kubectl get pv
+
+# Inspect the stuck PV's reclaim policy and claim ref
+kubectl get pv <pv-name> -o yaml
+
+# Clear the claimRef so the PV becomes Available again
+kubectl patch pv <pv-name> -p '{"spec":{"claimRef": null}}'
+```
+
+After patching, the PV transitions back to `Available` and is bindable by a new PVC.
+
+## What to actually do
+
+- **Size your PVs carefully.** One-to-one binding means oversized PVs waste capacity you can't reclaim.
+- **Always know the state of your `Released` PVs.** A daily glance at `kubectl get pv` catches stuck volumes before they cause "we're out of storage" incidents.
+- **Pick reclaim policy with intent.** `Retain` for stateful production data. `Delete` only for ephemeral caches you're truly fine losing.
+
+---
+
+Have you been caught by either of these before?

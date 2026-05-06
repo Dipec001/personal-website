@@ -1,0 +1,70 @@
+---
+title: "Auto Scaling Is Adding Instances. Response Times Are Still Climbing."
+description: "Scaling kicks in, new instances launch, but response times keep rising and you can't understand why. The gap between InService and actually ready is where this lives."
+date: "2026-04-06"
+series: "aws-daily-with-divine"
+tags: ["aws", "auto-scaling", "lifecycle-hooks", "performance"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-autoscaling-devops-activity-7444292480021225472-z3av"
+---
+
+If you've used Auto Scaling, you've probably experienced this. The scaling kicks in, new instances launch, but response times keep climbing and you can't understand why.
+
+Here's what is actually happening.
+
+## The InService lie
+
+When Auto Scaling launches a new instance, by default it immediately marks it as `InService` and the load balancer starts sending traffic to it.
+
+But the instance might not actually be ready yet. The OS is still booting. Your application is still starting up. Dependencies are still loading. **Requests hit it before it can handle them properly**, which causes errors and slow responses — even though Auto Scaling is doing exactly what you configured it to do.
+
+Auto Scaling working correctly and your application being ready are two different things.
+
+## The fix: lifecycle hooks
+
+Lifecycle hooks let you pause the instance in a `Pending` state before it goes `InService`. During that pause you can:
+
+- Run scripts
+- Install software
+- Pull configs
+- Warm up the application cache
+- Run health checks
+
+Only when your script signals **ready** does Auto Scaling move the instance to `InService` and the load balancer starts sending traffic.
+
+## Concrete numbers
+
+Say your application takes 3 minutes to fully initialize — loading config, connecting to the database, warming the cache.
+
+| Without lifecycle hook | With lifecycle hook |
+|---|---|
+| Traffic arrives after ~30s | Traffic arrives after the full 3 min |
+| 2.5 min of slow/failed requests on every new instance | Users never notice the scale-out happened |
+
+## Setting one up
+
+Adding a launch lifecycle hook is one CLI command:
+
+```bash
+aws autoscaling put-lifecycle-hook \
+  --auto-scaling-group-name my-asg \
+  --lifecycle-hook-name on-instance-launch \
+  --lifecycle-transition autoscaling:EC2_INSTANCE_LAUNCHING \
+  --heartbeat-timeout 600 \
+  --default-result ABANDON
+```
+
+Then in your bootstrap script, when initialization is genuinely complete:
+
+```bash
+aws autoscaling complete-lifecycle-action \
+  --lifecycle-hook-name on-instance-launch \
+  --auto-scaling-group-name my-asg \
+  --lifecycle-action-result CONTINUE \
+  --instance-id "$INSTANCE_ID"
+```
+
+`ABANDON` as the default result is a deliberate choice — if your script never signals ready before the timeout, the instance is removed instead of taking traffic. Fail closed, not fail open.
+
+---
+
+Have you experienced this before? How did you fix it?

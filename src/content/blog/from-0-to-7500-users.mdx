@@ -1,0 +1,40 @@
+---
+title: "From 0 to 7,500 Users on a WhatsApp Banking Platform — What Broke, What Held"
+description: "Three months building Kira AI in production. The technical decisions mattered less than I expected. The product and operational decisions mattered more."
+date: "2026-04-08"
+series: "notes"
+tags: ["fintech", "whatsapp", "scaling", "kira"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_from-0-to-7500-users-on-a-whatsapp-banking-activity-7444654931862503424-MKy1"
+---
+
+Been a couple of months since we launched Kira AI, our WhatsApp-native banking platform, and the things that actually mattered were nothing like what I expected when we started.
+
+## Broadcasting is harder than it looks on WhatsApp
+
+We wanted to communicate with our users and since Kira lives entirely on WhatsApp, broadcasting on WhatsApp was the obvious channel. No app, no push notifications, just WhatsApp.
+
+But Meta categorizes promotional messages under marketing and they are not delivered to all users by default. I had to learn how Meta actually works in production, not how the documentation says it works.
+
+What looks simple on paper becomes a real operational challenge when you have thousands of users expecting to hear from you.
+
+## We over-engineered the conversation
+
+We spent significant time building a sophisticated conversational experience because we wanted Kira to feel human and not robotic.
+
+Turns out users primarily wanted one thing: **to send money reliably and on time.** Simplicity beats cleverness when real money is involved. People care about their money arriving correctly far more than they care about how elegant the conversation feels.
+
+We learned to build for what users actually do, not what we thought they would appreciate.
+
+## Monitoring was an afterthought and we felt that cost
+
+We built fast and shipped fast but observability came last. We were reactive instead of proactive — finding out about problems when users reported them instead of before they did.
+
+Everyone wants to build the next elegant feature, but without deep insight into how your system is actually performing you are flying blind.
+
+If I could go back, **monitoring and observability would be built in from day one, not added later.**
+
+---
+
+Three months. 7,500 users. ₦272M+ processed. The technical decisions mattered less than I expected. The product and operational decisions mattered more than I anticipated.
+
+What's a lesson you learned the hard way building a real product?

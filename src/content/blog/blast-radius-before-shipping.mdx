@@ -1,0 +1,49 @@
+---
+title: "How I Think About Blast Radius Before I Ship Anything to Production"
+description: "Four questions before every deploy: What fails if this breaks? Who is affected? How fast can we detect it? How fast can we recover?"
+date: "2026-04-13"
+series: "notes"
+tags: ["deployments", "production", "incident-response"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_%F0%9D%90%87%F0%9D%90%A8%F0%9D%90%B0-%F0%9D%90%88-%F0%9D%90%AD%F0%9D%90%A1%F0%9D%90%A2%F0%9D%90%A7%F0%9D%90%A4-%F0%9D%90%9A%F0%9D%90%9B%F0%9D%90%A8%F0%9D%90%AE%F0%9D%90%AD-%F0%9D%90%9B%F0%9D%90%A5%F0%9D%90%9A%F0%9D%90%AC%F0%9D%90%AD-activity-7447895816553451520-Nhk_"
+---
+
+Four questions before every deploy:
+
+> **What fails if this breaks? Who is affected? How fast can we detect it? How fast can we recover?**
+
+Do you ask yourself these questions? If not, let me tell you why you should.
+
+## The day a small feature became a big problem
+
+A few years back, I finished working on a small feature for an order system. Ran local tests. Everything looked solid. I pushed.
+
+Something broke.
+
+I rolled back immediately, thinking I had missed something in the pipeline — but that made things worse. The deployment had already run database migrations, and rolling back the code doesn't roll back the database. At least not in any straightforward way.
+
+No immediate complaints came in from users, and that was only because the discovery was fast. Unconventional, but I discovered the break because I was hungry and decided to place an order myself. To my greatest dismay, it failed.
+
+I checked the logs, realized what had happened, rolled back, and walked straight into bigger problems. Tragic. 😂
+
+Still calm, I manually patched the database to match what the code expected, fixed the underlying issue, and redeployed behind a feature flag this time so there were no database implications if something went wrong again.
+
+## What the four questions would have caught
+
+If I had asked myself those four questions before deploying, I would have recognized that **a migration touching the order system had a wide blast radius** and prepared a safer recovery path before shipping.
+
+- **What fails if this breaks?** Order placement.
+- **Who is affected?** Every customer trying to buy anything.
+- **How fast can we detect it?** Without proactive monitoring on order success rate, we'd find out from users — too slow.
+- **How fast can we recover?** With a non-trivial schema migration in flight, rollback is not free. The path back to a healthy state is hours, not minutes.
+
+That recognition alone changes the deploy plan. Feature flag from the start. Forward-only migration. Pre-deploy alerts on order success rate. A quick recovery script staged and ready.
+
+## What I do now
+
+I ask the four questions before every deploy. And just as importantly — **I make sure my setup can answer them accurately too.** A question you can't answer with data is just a vibe.
+
+Experience really is an excellent teacher.
+
+---
+
+Have you had a similar experience? How did you respond?
