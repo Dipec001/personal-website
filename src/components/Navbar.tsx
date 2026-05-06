@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MobileMenu from "./MobileMenu";
 
 const links = [
   { href: "/", label: "Home" },
@@ -17,7 +18,9 @@ export default function Navbar() {
         >
           divine<span className="text-accent">.</span>chukwu
         </Link>
-        <ul className="flex items-center gap-1">
+
+        {/* Desktop nav */}
+        <ul className="hidden items-center gap-1 sm:flex">
           {links.map((l) => (
             <li key={l.href}>
               <Link
@@ -38,6 +41,11 @@ export default function Navbar() {
             </a>
           </li>
         </ul>
+
+        {/* Mobile menu */}
+        <div className="sm:hidden">
+          <MobileMenu />
+        </div>
       </nav>
     </header>
   );
