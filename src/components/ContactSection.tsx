@@ -4,8 +4,8 @@ import SectionHeading from "./SectionHeading";
 const channels = [
   {
     label: "Email",
-    handle: "dpecchukwu@gmail.com",
-    href: "mailto:dpecchukwu@gmail.com",
+    handle: "divine@divinechukwu.com",
+    href: "mailto:divine@divinechukwu.com",
   },
   {
     label: "LinkedIn",
