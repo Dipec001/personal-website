@@ -1,0 +1,70 @@
+---
+title: "etcd Is the Brain of Your Cluster — Here's My 10-Minute Backup Routine"
+description: "etcd is your cluster's source of truth — every Secret, deployment, and config lives there. Here's the 10-minute backup routine I set once and never skip."
+date: "2026-05-07"
+series: "k8s-with-divine"
+tags: ["kubernetes", "etcd", "backups", "production", "cka"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-share-7458152900624592896-HpDe"
+---
+
+Before the 10-minute backup setup, you need to understand why this backup matters more than any other in your cluster.
+
+## Why etcd matters more than anything else
+
+etcd stores **the desired state of your entire cluster**. Every `kubectl apply`, `kubectl delete`, and `kubectl edit` you've ever run — the resulting state lives in etcd. It's the single source of truth for everything Kubernetes knows about your cluster.
+
+If it's lost or corrupted, your cluster doesn't have that information anymore. It can't process new requests. It doesn't know what should be running or where.
+
+So how do you make sure you're never in that situation? **Snapshots.**
+
+## The snapshot command
+
+```bash
+ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+  --cacert=<trusted-ca-file> --cert=<cert-file> --key=<key-file> \
+  snapshot save <backup-file-location>
+```
+
+The `cacert`, `cert`, and `key` file paths can be pulled from the etcd pod spec — `kubectl describe pod -n kube-system <etcd-pod>` will show them.
+
+Takes about 10 minutes to set up properly the first time. **Seconds to run after that.**
+
+## One thing to note: encrypt the snapshot
+
+**etcd snapshots contain every Kubernetes Secret in plaintext.**
+
+Don't leave them sitting on the same node as etcd or in an unencrypted bucket. Move them offsite — S3 with KMS, or whatever your equivalent is. A snapshot that doesn't survive a node failure isn't really a backup.
+
+## How often?
+
+**Daily via cron is the baseline in production.** For high-churn clusters with frequent deploys or lots of CRDs being installed, bump it to hourly.
+
+Disk is cheap. Rebuilding your cluster from memory isn't.
+
+## The restore
+
+A backup means nothing without knowing how to restore. Here's how:
+
+```bash
+etcdutl --data-dir <data-dir-location> snapshot restore snapshot.db
+```
+
+But be careful. **Never restore while API servers are running.**
+
+The correct order is:
+
+1. **Stop** all API server instances
+2. **Restore** state in all etcd instances
+3. **Restart** the API server instances
+
+Skipping this order causes data inconsistencies that are worse than the original problem.
+
+## High-availability clusters
+
+In production clusters you typically run **3 or 5 etcd instances** for high availability — but each one still needs to be backed up independently.
+
+> This is the one backup that matters more than any other in the cluster.
+
+---
+
+Do you back up your etcd regularly? If you aren't, you're one corrupted node away from starting over.
