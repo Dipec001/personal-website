@@ -31,7 +31,7 @@ const personSchema = {
     "https://www.linkedin.com/in/divine-chukwu-63bb04145/",
     "https://github.com/Dipec001",
     "https://x.com/dipec_pascal",
-    "https://www.credly.com/users/divine-chukwu",
+    "https://www.credly.com/users/divinechukwu",
   ],
   worksFor: {
     "@type": "Organization",
