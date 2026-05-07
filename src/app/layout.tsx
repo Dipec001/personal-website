@@ -123,13 +123,13 @@ export const metadata: Metadata = {
     siteName: "Divine Chukwu",
     title: "Divine Chukwu — DevOps & Backend Engineer",
     description:
-      "Production systems, cloud infrastructure, and payment platforms — built like real products. Co-Founder & CTO at Kira AI. Ex-Y-Queue (acquired).",
+      "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Divine Chukwu — DevOps & Backend Engineer",
     description:
-      "Production systems, cloud infrastructure, and payment platforms — built like real products. Co-Founder & CTO at Kira AI. Ex-Y-Queue (acquired).",
+      "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
     creator: "@dipec_pascal",
   },
   robots: { index: true, follow: true },
