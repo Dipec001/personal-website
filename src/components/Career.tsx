@@ -1,4 +1,11 @@
+import Image from "next/image";
 import SectionHeading from "./SectionHeading";
+
+type RoleImage = {
+  src: string;
+  alt: string;
+  caption?: string;
+};
 
 type Role = {
   company: string;
@@ -9,6 +16,7 @@ type Role = {
   blurb: string;
   status?: "current" | "acquired" | "contract";
   note?: string;
+  images?: RoleImage[];
 };
 
 const roles: Role[] = [
@@ -20,6 +28,18 @@ const roles: Role[] = [
     blurb:
       "Building WhatsApp-native banking from zero. 7,500+ users, ₦280M+ processed in production across 5 payment rails.",
     status: "current",
+    images: [
+      {
+        src: "/kira-speaking.jpg",
+        alt: "Speaking on stage at Enugu Tech Fest 2026",
+        caption: "Speaking at Enugu Tech Fest",
+      },
+      {
+        src: "/kira-team.jpg",
+        alt: "With Kira teammates at TD Africa",
+        caption: "On the ground with the Kira team",
+      },
+    ],
   },
   {
     company: "Travi Mobile Ltd",
@@ -140,6 +160,34 @@ export default function Career() {
 
             {role.note && (
               <p className="mt-2 font-mono text-[11px] text-muted">{role.note}</p>
+            )}
+
+            {role.images && role.images.length > 0 && (
+              <ul className="mt-5 flex flex-wrap gap-3">
+                {role.images.map((img) => (
+                  <li
+                    key={img.src}
+                    className="group relative overflow-hidden rounded-lg border border-card-border bg-card-bg transition-colors hover:border-accent/60"
+                  >
+                    <div className="relative h-44 w-32 sm:h-52 sm:w-40">
+                      <Image
+                        src={img.src}
+                        alt={img.alt}
+                        fill
+                        sizes="(min-width: 640px) 160px, 128px"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    {img.caption && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-2 pt-6">
+                        <p className="font-mono text-[10px] uppercase tracking-wide text-foreground/90">
+                          {img.caption}
+                        </p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
             )}
           </li>
         ))}
