@@ -75,10 +75,10 @@ export const projects: Project[] = [
   },
   {
     slug: "y-queue",
-    name: "Y-Queue",
-    tagline: "Queue management — acquired.",
+    name: "Y-Queue?",
+    tagline: "On-demand food ordering & delivery — acquired.",
     description:
-      "Took the pain out of physical queues for service businesses. Customers join from their phone, get notified when it's their turn, and businesses see real-time queue analytics. Successfully acquired.",
+      "Nigerian on-demand food ordering and delivery — think Uber Eats / Chowdeck. Customers order from local restaurants, drivers deliver, restaurants get reach. I co-founded and led backend: order routing, payment splits, real-time dispatch, and the operational tooling that kept the marketplace running. Successfully acquired.",
     status: "acquired",
     metrics: ["4,000+ users", "Successfully acquired"],
     stack: ["Python", "Django", "PostgreSQL", "AWS"],

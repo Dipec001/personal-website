@@ -48,7 +48,7 @@ const roles: Role[] = [
     end: "Nov 2025",
     location: "Nigeria · Remote",
     blurb:
-      "Co-founded a queue management platform. 4,000+ users. Successfully acquired.",
+      "Co-founded an on-demand food ordering and delivery platform (think Chowdeck / Uber Eats). Built the backend handling orders, payments, and dispatch. 4,000+ users. Successfully acquired.",
     status: "acquired",
   },
   {
