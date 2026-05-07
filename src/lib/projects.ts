@@ -78,7 +78,7 @@ export const projects: Project[] = [
     name: "Y-Queue?",
     tagline: "Social-feed food delivery — acquired.",
     description:
-      "Food delivery reimagined as social media. Think TikTok meets Uber Eats — food videos, likes, comments and restaurant pages drove discovery; tap a dish you want, place the order, drivers deliver in real time. I co-founded and led backend: the social graph and feed ranking, order routing, payment splits, dispatch, and the operational tooling that kept the marketplace running. Three hard problems in one product — content, marketplace, logistics. Successfully acquired.",
+      "Not your regular ordering app — food delivery reimagined as social media. Think TikTok meets Uber Eats: food videos, likes, comments and restaurant pages drove discovery; tap a dish you want, place the order, drivers deliver in real time. I co-founded and led backend: the social graph and feed ranking, order routing, payment splits, dispatch, and the operational tooling that kept the marketplace running. Three hard problems in one product — content, marketplace, logistics. Successfully acquired.",
     status: "acquired",
     metrics: [
       "4,000+ users",
