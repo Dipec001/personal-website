@@ -76,11 +76,15 @@ export const projects: Project[] = [
   {
     slug: "y-queue",
     name: "Y-Queue?",
-    tagline: "On-demand food ordering & delivery — acquired.",
+    tagline: "Social-feed food delivery — acquired.",
     description:
-      "Nigerian on-demand food ordering and delivery — think Uber Eats / Chowdeck. Customers order from local restaurants, drivers deliver, restaurants get reach. I co-founded and led backend: order routing, payment splits, real-time dispatch, and the operational tooling that kept the marketplace running. Successfully acquired.",
+      "Food delivery reimagined as social media. Think TikTok meets Uber Eats — food videos, likes, comments and restaurant pages drove discovery; tap a dish you want, place the order, drivers deliver in real time. I co-founded and led backend: the social graph and feed ranking, order routing, payment splits, dispatch, and the operational tooling that kept the marketplace running. Three hard problems in one product — content, marketplace, logistics. Successfully acquired.",
     status: "acquired",
-    metrics: ["4,000+ users", "Successfully acquired"],
+    metrics: [
+      "4,000+ users",
+      "Social feed + delivery marketplace in one product",
+      "Successfully acquired",
+    ],
     stack: ["Python", "Django", "PostgreSQL", "AWS"],
   },
 ];
