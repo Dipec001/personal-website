@@ -23,9 +23,9 @@ const personSchema = {
   alternateName: "Dipec",
   url: SITE_URL,
   image: `${SITE_URL}/me.jpeg`,
-  jobTitle: "DevOps & Backend Engineer",
+  jobTitle: "DevOps, Backend & Cloud Engineer",
   description:
-    "DevOps & Backend Engineer. Co-Founder & CTO at Kira AI. Builds production systems that actually work — cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
+    "DevOps, Backend & Cloud Engineer. Co-Founder & CTO at Kira AI. Builds production systems that actually work — cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   email: "mailto:divine@divinechukwu.com",
   sameAs: [
     "https://www.linkedin.com/in/divine-chukwu-63bb04145/",
@@ -98,7 +98,7 @@ const personSchema = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Divine Chukwu — DevOps & Backend Engineer",
+    default: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
     template: "%s · Divine Chukwu",
   },
   description:
@@ -107,6 +107,10 @@ export const metadata: Metadata = {
     "Divine Chukwu",
     "DevOps Engineer",
     "Backend Engineer",
+    "Cloud Engineer",
+    "AWS Solutions Architect",
+    "Site Reliability Engineer",
+    "Platform Engineer",
     "AWS",
     "Kubernetes",
     "Terraform",
@@ -121,13 +125,13 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "Divine Chukwu",
-    title: "Divine Chukwu — DevOps & Backend Engineer",
+    title: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
     description:
       "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Divine Chukwu — DevOps & Backend Engineer",
+    title: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
     description:
       "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
     creator: "@dipec_pascal",

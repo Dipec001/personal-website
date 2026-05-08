@@ -122,7 +122,7 @@ export default async function BlogPostOG(props: {
                   color: "#a1a1aa",
                 }}
               >
-                DevOps & Backend Engineer
+                DevOps, Backend & Cloud Engineer
               </span>
             </div>
           </div>

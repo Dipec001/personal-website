@@ -6,6 +6,7 @@ const ROLES = [
   "DevOps Engineer.",
   "Site Reliability Engineer.",
   "Platform Engineer.",
+  "Cloud Engineer.",
   "Solutions Architect.",
   "Backend Engineer.",
 ];

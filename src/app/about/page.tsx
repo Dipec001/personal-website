@@ -28,8 +28,8 @@ export default function AboutPage() {
             Hey, I&apos;m Divine.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-muted">
-            DevOps & Backend Engineer. Co-Founder & CTO at Kira AI. Senior
-            DevOps Engineer at Travi Mobile. Based in Nigeria.
+            DevOps, Backend & Cloud Engineer. Co-Founder & CTO at Kira AI.
+            Senior DevOps Engineer at Travi Mobile. Based in Nigeria.
           </p>
         </div>
         <div className="relative aspect-[3/4] w-full max-w-[200px] overflow-hidden rounded-2xl border border-card-border-strong shadow-2xl shadow-black/40 sm:max-w-[180px]">
@@ -165,6 +165,14 @@ export default function AboutPage() {
               roles — especially at fintechs, payments companies, or
               infrastructure SaaS where the system actually runs in production
               with real users and real money.
+            </li>
+            <li>
+              Senior{" "}
+              <strong className="text-foreground">
+                Cloud Engineering / Solutions Architect
+              </strong>{" "}
+              roles — designing and operating AWS-native systems for the same
+              kind of company.
             </li>
             <li>
               Senior{" "}

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export const alt = "Divine Chukwu — DevOps & Backend Engineer";
+export const alt = "Divine Chukwu — DevOps, Backend & Cloud Engineer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -73,13 +73,13 @@ export default async function OpenGraphImage() {
             <div
               style={{
                 marginTop: 18,
-                fontSize: 40,
+                fontSize: 38,
                 fontWeight: 500,
                 letterSpacing: "-0.02em",
                 color: "#a1a1aa",
               }}
             >
-              DevOps & Backend Engineer.
+              DevOps, Backend & Cloud Engineer.
             </div>
           </div>
 
