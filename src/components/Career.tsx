@@ -59,7 +59,7 @@ const roles: Role[] = [
     end: "Jan 2026",
     location: "Remote",
     blurb:
-      "Backend services and AWS infrastructure for production clients. Django, FastAPI, PostgreSQL, deployment, and operations.",
+      "End-to-end ownership across multiple production clients — designed and operated AWS infrastructure (EC2, RDS, S3), deployment pipelines, monitoring, and the application layer (Django, FastAPI, PostgreSQL).",
   },
   {
     company: "Revive Active Ltd",
@@ -78,7 +78,7 @@ const roles: Role[] = [
     end: "Feb 2024",
     location: "Nigeria · Remote",
     blurb:
-      "Two contracts: built a mentor-mentee platform — backend services and deployment. Python, Django.",
+      "Two contracts: built and deployed a mentor-mentee platform — backend services, database design, AWS deployment, and production operations. Python, Django.",
     status: "contract",
   },
   {
