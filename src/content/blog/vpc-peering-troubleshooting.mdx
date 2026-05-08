@@ -1,0 +1,56 @@
+---
+title: "VPC Peering Configured. Route Tables Look Correct. Instances Still Can't Communicate."
+description: "Four things must be in place for VPC peering to actually work — and the most common culprit by far is the second one."
+date: "2026-04-02"
+series: "aws-daily-with-divine"
+tags: ["aws", "vpc", "networking", "troubleshooting"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-vpc-devops-activity-7442480407113043968-I9AH"
+---
+
+VPC peering is how two VPCs communicate with each other, and when it's misconfigured it can be really frustrating if you don't know exactly what to check. Here are the four things that must be in place for peering to actually work.
+
+## 1. The peering connection must be Active
+
+When you create a peering connection, the other VPC owner has to accept it. If it's in the same account it can be auto-accepted, but **always check the status shows `Active` and not `Pending`.**
+
+```bash
+aws ec2 describe-vpc-peering-connections \
+  --filters Name=status-code,Values=active
+```
+
+## 2. Route tables must be updated on BOTH sides — this is where most people get stuck
+
+Creating the peering connection **doesn't automatically add routes.** You have to:
+
+- Add a route in VPC A's route table pointing to VPC B's CIDR range via the peering connection
+- Add the same kind of route in VPC B's route table pointing back to VPC A
+
+Most engineers add it on one side and forget the other. Traffic goes one way but can't come back.
+
+## 3. Security groups must allow traffic from the other VPC's CIDR range
+
+Your security group on the receiving instance needs an inbound rule allowing traffic from the **other VPC's IP range** — not just from its own VPC.
+
+## 4. NACLs must allow traffic in both directions
+
+NACLs are stateless. You need explicit **inbound AND outbound** rules for traffic to flow. Many people configure inbound correctly and forget the outbound response traffic.
+
+## The most common culprit by far
+
+> The peering connection exists, everything looks configured, but the route table on one side is incomplete and traffic has nowhere to go.
+
+It's number 2 — almost every time. The others tend to feel like common knowledge once you've seen them once. Routes are easy to miss because you're looking at the peering connection itself and not the route tables that have to actually use it.
+
+A 30-second verification — list all routes targeting peering connections across the account:
+
+```bash
+aws ec2 describe-route-tables \
+  --query 'RouteTables[*].Routes[?VpcPeeringConnectionId!=null].[VpcPeeringConnectionId,DestinationCidrBlock]' \
+  --output table
+```
+
+You should see entries pointing to **both directions.** If only one shows up, you found it.
+
+---
+
+Have you encountered issues with your VPC peering setup? How did you troubleshoot it?

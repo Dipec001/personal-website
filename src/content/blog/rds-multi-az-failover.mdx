@@ -1,0 +1,65 @@
+---
+title: "RDS Multi-AZ Failover Took 6 Minutes. Your SLA Requires 2."
+description: "Multi-AZ promotes the standby in 60 to 120 seconds. DNS caching, connection pools, and missing retries quietly stretch recovery beyond your SLA."
+date: "2026-04-12"
+series: "aws-daily-with-divine"
+tags: ["aws", "rds", "multi-az", "high-availability", "production"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-rds-devops-activity-7447370434511159297-e6yD"
+---
+
+Experience is the best teacher, and this is one of those things you really only fully appreciate when it happens to you in production.
+
+## What actually happens during failover
+
+When the RDS primary instance fails, AWS promotes the standby to primary, and **that part is actually fast — usually 60 to 120 seconds.**
+
+The way your application finds the new primary is through DNS. RDS gives you one endpoint, and during failover AWS updates that DNS record to point to the new primary. On paper this sounds seamless. In practice, three things quietly extend your recovery time well beyond your SLA.
+
+## The three SLA killers
+
+### 1. DNS TTL not reduced
+
+Your application server (or the network layer between it and RDS) caches the old DNS record. Even though AWS updated DNS, your app is still trying to connect to the old IP of the failed primary, and it keeps failing until the TTL expires and the cache refreshes.
+
+**Default TTL is 60 to 300 seconds.** That alone can add minutes to your recovery time without any obvious error explaining why.
+
+### 2. Application not configured to retry on connection failure
+
+After failover, existing database connections drop. If your application doesn't have retry logic built in, it just fails and returns errors to users — instead of automatically reconnecting to the new primary.
+
+A simple retry decorator in Python:
+
+```python
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+)
+def get_db_connection():
+    return create_connection()
+```
+
+### 3. Connection pool holding stale connections
+
+Your connection pool established connections to the old primary. Those connections are now dead but the pool doesn't know that yet. It keeps handing out dead connections until they time out, adding more delay.
+
+The fix is connection validation before each use. SQLAlchemy makes this a one-liner:
+
+```python
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,   # validate connection before handing it out
+    pool_recycle=300,     # recycle connections every 5 minutes
+)
+```
+
+## What "fast failover" actually requires
+
+> Multi-AZ gives you the redundancy. These three things give you the recovery speed.
+
+Reduce DNS TTL, build retry logic into the app, and configure your connection pool to validate before handing connections out. None of them are hard. All three are usually missing.
+
+---
+
+Have you encountered this before? How did you navigate it?

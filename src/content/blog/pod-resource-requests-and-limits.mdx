@@ -1,0 +1,74 @@
+---
+title: "We Didn't Set Resource Requests on Our Pods in Production. Here's Exactly What Happened."
+description: "Without requests, the scheduler places pods blindly and noisy neighbors take down everything on the node. Without limits, there's no ceiling."
+date: "2026-04-09"
+series: "k8s-with-divine"
+tags: ["kubernetes", "scheduling", "production", "resource-management"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7445017252145385472-i0E9"
+---
+
+Resource requests should be standard practice for anyone running workloads on Kubernetes — unless you're running applications that can withstand unexpected downtime.
+
+## What requests actually do
+
+Requests are how you tell Kubernetes the **minimum** amount of CPU and memory a pod needs to function properly.
+
+Think of it as your way of telling Kubernetes:
+
+> "Hey, this app needs at least this much CPU and memory to work properly. Please make sure it gets that."
+
+The scheduler uses that number to decide which node to place the pod on, and **reserves that amount on the node's capacity even if the pod isn't actively using it yet.**
+
+So if a node has 4GB of memory and your pods have requests totaling 3.8GB, the scheduler won't place another pod there even if actual usage is low. This prevents overcommitment and protects pods from each other.
+
+## What happens without requests: noisy neighbors
+
+Without requests, the scheduler has no information to make good placement decisions. So it places pods blindly — and one greedy pod can take down everything on that node.
+
+These are called **noisy neighbors.**
+
+Here's what that looks like in practice. A node with 4GB of memory and three pods running on it:
+
+- **Pod A** has no resource requests set. It has a memory leak. Starts to consume 3.5GB.
+- **Pod B** is starved and gets `OOMKilled`.
+- **Pod C** can't be scheduled on that node anymore.
+
+Pod A's bad behavior affected every workload sharing that node.
+
+## Requests aren't the full picture — limits matter too
+
+Requests are what the scheduler uses for placement. **Limits** are the ceiling a pod cannot exceed. A pod can use more than its request, but never more than its limit.
+
+Without limits, a pod can consume everything available on the node.
+
+| When you hit | What happens |
+|---|---|
+| **CPU limit** | Pod gets throttled silently — slows down but keeps running |
+| **Memory limit** | Pod gets `OOMKilled` immediately, no warning |
+
+## Setting both properly
+
+```yaml
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+```
+
+The ideal setup is to **always set both requests and limits.** For very critical applications, at minimum always set the requests.
+
+## Quick audit on your own cluster
+
+```bash
+kubectl get pods --all-namespaces -o json \
+  | jq -r '.items[] | select(.spec.containers[].resources.requests == null) | "\(.metadata.namespace)/\(.metadata.name)"'
+```
+
+That gives you every pod missing requests across the entire cluster. The list is usually longer than people expect.
+
+---
+
+Do you set resource requests and limits on all your pods?
