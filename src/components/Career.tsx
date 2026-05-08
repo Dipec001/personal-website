@@ -64,7 +64,7 @@ const roles: Role[] = [
   {
     company: "Y-Queue?",
     title: "Co-Founder & Lead Backend Engineer",
-    start: "Nov 2023",
+    start: "Aug 2022",
     end: "Nov 2025",
     location: "Nigeria · Remote",
     blurb:
