@@ -181,11 +181,10 @@ export default function AboutPage() {
             </li>
           </ul>
           <p>
-            Based in Nigeria. Remote-first or relocation to{" "}
+            Based in Nigeria. Remote-first. Open to relocation{" "}
             <strong className="text-foreground">
-              Dubai, Germany, or Ireland
-            </strong>{" "}
-            both work.
+              for the right opportunity.
+            </strong>
           </p>
           <p>
             Less interested in ad-tech, crypto, or anywhere the pitch leads
