@@ -59,7 +59,27 @@ const roles: Role[] = [
     end: "Jan 2026",
     location: "Remote",
     blurb:
-      "Backend services for production clients. Django, FastAPI, PostgreSQL, AWS.",
+      "Backend services and AWS infrastructure for production clients. Django, FastAPI, PostgreSQL, deployment, and operations.",
+  },
+  {
+    company: "Revive Active Ltd",
+    title: "Freelance Backend & Infrastructure Engineer",
+    start: "Oct 2024",
+    end: "Jan 2025",
+    location: "United Kingdom · Remote",
+    blurb:
+      "Sole backend lead and architect for Activity Rewards — a gamified fitness mobile app. Designed the API, database, real-time leaderboard via WebSockets, async jobs with Celery, and end-to-end AWS deployment. Stack: Python, Django, Celery, WebSockets, AWS.",
+    status: "contract",
+  },
+  {
+    company: "Reispar Technologies",
+    title: "Full Stack (Backend) Developer",
+    start: "Nov 2023",
+    end: "Feb 2024",
+    location: "Nigeria · Remote",
+    blurb:
+      "Two contracts: built a mentor-mentee platform — backend services and deployment. Python, Django.",
+    status: "contract",
   },
   {
     company: "Y-Queue?",
@@ -68,17 +88,8 @@ const roles: Role[] = [
     end: "Nov 2025",
     location: "Nigeria · Remote",
     blurb:
-      "Co-founded a social-feed-driven food delivery platform (think TikTok meets Uber Eats). Built the backend: social graph, feed ranking, orders, payments, and dispatch. 4,000+ users. Successfully acquired.",
+      "Co-founded a social-feed-driven food delivery platform (think TikTok meets Uber Eats). Owned backend and AWS infrastructure end-to-end: social graph, feed ranking, orders, payments, dispatch, and the cloud deployment that hosted it. 4,000+ users. Successfully acquired.",
     status: "acquired",
-  },
-  {
-    company: "Reispar Technologies",
-    title: "Full Stack (Backend) Developer",
-    start: "Nov 2023",
-    end: "Feb 2024",
-    location: "Nigeria · Remote",
-    blurb: "Backend services and full-stack delivery.",
-    status: "contract",
   },
 ];
 

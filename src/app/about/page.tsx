@@ -56,14 +56,8 @@ export default function AboutPage() {
             it&apos;s polished.
           </p>
           <p>
-            University of Nigeria, Nsukka was where I learned the fundamentals
-            — Computer &amp; Electronics Engineering. The years after were
-            contract work, slowly figuring out what kind of engineer I wanted
-            to be: the one who builds things that survive contact with real
-            users — and runs the infrastructure they live on.
-          </p>
-          <p>
-            In late 2023 I co-founded{" "}
+            While studying Computer &amp; Electronics Engineering at University
+            of Nigeria, Nsukka, I co-founded{" "}
             <Link
               href="/projects"
               className="text-accent underline-offset-4 hover:underline"
@@ -71,11 +65,21 @@ export default function AboutPage() {
               Y-Queue?
             </Link>{" "}
             — a social-feed-driven food delivery platform (think TikTok meets
-            Uber Eats). I led backend. Two years later, we were acquired. That
-            experience taught me something I now treat as gospel:{" "}
+            Uber Eats). I led backend and owned the AWS infrastructure it ran
+            on. Three years later, we were acquired. That experience taught me
+            something I now treat as gospel:{" "}
             <strong className="text-foreground">
               simplicity beats cleverness when real money is involved.
             </strong>
+          </p>
+          <p>
+            In parallel, contract and freelance work — including six months as
+            sole backend &amp; infrastructure lead for{" "}
+            <strong className="text-foreground">Activity Rewards</strong>, a
+            gamified fitness app for Revive Active (UK). Real-time leaderboards
+            over WebSockets, AWS deployment, the lot. International client
+            delivery taught me to operate the systems I build, not just hand
+            them off.
           </p>
           <p>
             Late 2025 I co-founded <strong className="text-foreground">Kira AI</strong>
