@@ -51,8 +51,8 @@ export default function AboutPage() {
         </h2>
         <div className="mt-6 space-y-5 text-base leading-relaxed text-foreground/85">
           <p>
-            I started building things in Nigeria, the way most engineers here
-            start — figure out what&apos;s possible, then ship it before
+            I started building things in Nigeria the way most engineers here
+            start, figuring out what&apos;s possible and shipping before
             it&apos;s polished.
           </p>
           <p>
@@ -63,18 +63,18 @@ export default function AboutPage() {
               className="text-accent underline-offset-4 hover:underline"
             >
               Y-Queue?
-            </Link>{" "}
-            — a social-feed-driven food delivery platform (think TikTok meets
-            Uber Eats). I led backend and owned the AWS infrastructure it ran
-            on. Three years later, we were acquired. That experience taught me
+            </Link>
+            . Social-feed-driven food delivery, basically TikTok meets Uber
+            Eats. I led backend and owned the AWS infrastructure it ran on.
+            Three years later, we were acquired. That experience taught me
             something I now treat as gospel:{" "}
             <strong className="text-foreground">
               simplicity beats cleverness when real money is involved.
             </strong>
           </p>
           <p>
-            In parallel, contract and freelance work — including six months as
-            sole backend &amp; infrastructure lead for{" "}
+            In parallel, contract and freelance work, including six months as
+            sole backend and infrastructure lead for{" "}
             <strong className="text-foreground">Activity Rewards</strong>, a
             gamified fitness app for Revive Active (UK). Real-time leaderboards
             over WebSockets, AWS deployment, the lot. International client
@@ -83,9 +83,9 @@ export default function AboutPage() {
           </p>
           <p>
             Late 2025 I co-founded <strong className="text-foreground">Kira AI</strong>
-            {" "}— WhatsApp-native banking. Send money, pay bills, manage
-            accounts, all inside a chat. No app install, no friction. As CTO I
-            designed the platform from zero — application architecture, cloud
+            , WhatsApp-native banking. Send money, pay bills, manage accounts,
+            all inside a chat. No app install, no friction. As CTO I designed
+            the platform from zero. That meant application architecture, cloud
             infrastructure on AWS, payment integrations, and the operational
             tooling that keeps it all running. Today: 9,000+ users, ₦519M+
             processed across five payment rails. Around the same time I joined
@@ -93,7 +93,7 @@ export default function AboutPage() {
             AWS EKS; promoted to Senior three months later.
           </p>
           <p>
-            Outside of that, I write. Two ongoing series —{" "}
+            Outside of that, I write. Two ongoing series,{" "}
             <Link
               href="/blog/series/aws-daily-with-divine"
               className="text-accent underline-offset-4 hover:underline"
@@ -106,8 +106,8 @@ export default function AboutPage() {
               className="text-accent underline-offset-4 hover:underline"
             >
               K8s with Divine
-            </Link>{" "}
-            — are my way of turning operational scars into things other
+            </Link>
+            , are my way of turning operational scars into things other
             engineers can learn from before they get burned the same way.
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function AboutPage() {
             <strong className="text-foreground">
               Simplicity beats cleverness when real money is involved.
             </strong>{" "}
-            Users care about their money arriving correctly — not how elegant
+            Users care about their money arriving correctly, not how elegant
             your API design is.
           </li>
         </ul>
@@ -166,7 +166,7 @@ export default function AboutPage() {
               <strong className="text-foreground">
                 DevOps / Platform / SRE
               </strong>{" "}
-              roles — especially at fintechs, payments companies, or
+              roles, especially at fintechs, payments companies, or
               infrastructure SaaS where the system actually runs in production
               with real users and real money.
             </li>
@@ -175,7 +175,7 @@ export default function AboutPage() {
               <strong className="text-foreground">
                 Cloud Engineering / Solutions Architect
               </strong>{" "}
-              roles — designing and operating AWS-native systems for the same
+              roles, designing and operating AWS-native systems for the same
               kind of company.
             </li>
             <li>

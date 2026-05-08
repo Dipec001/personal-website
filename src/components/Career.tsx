@@ -59,7 +59,7 @@ const roles: Role[] = [
     end: "Jan 2026",
     location: "Remote",
     blurb:
-      "End-to-end ownership across multiple production clients — designed and operated AWS infrastructure (EC2, RDS, S3), deployment pipelines, monitoring, and the application layer (Django, FastAPI, PostgreSQL).",
+      "End-to-end ownership across multiple production clients. Designed and operated AWS infrastructure (EC2, RDS, S3), deployment pipelines, monitoring, and the application layer (Django, FastAPI, PostgreSQL).",
   },
   {
     company: "Revive Active Ltd",
@@ -68,7 +68,7 @@ const roles: Role[] = [
     end: "Jan 2025",
     location: "United Kingdom · Remote",
     blurb:
-      "Sole backend lead and architect for Activity Rewards — a gamified fitness mobile app. Designed the API, database, real-time leaderboard via WebSockets, async jobs with Celery, and end-to-end AWS deployment. Stack: Python, Django, Celery, WebSockets, AWS.",
+      "Sole backend lead and architect for Activity Rewards, a gamified fitness mobile app. Designed the API, database, real-time leaderboard via WebSockets, async jobs with Celery, and end-to-end AWS deployment. Stack: Python, Django, Celery, WebSockets, AWS.",
     status: "contract",
   },
   {
@@ -78,7 +78,7 @@ const roles: Role[] = [
     end: "Feb 2024",
     location: "Nigeria · Remote",
     blurb:
-      "Two contracts: built and deployed a mentor-mentee platform — backend services, database design, AWS deployment, and production operations. Python, Django.",
+      "Two contracts: built and deployed a mentor-mentee platform. Backend services, database design, AWS deployment, and production operations. Python, Django.",
     status: "contract",
   },
   {

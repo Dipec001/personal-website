@@ -53,7 +53,7 @@ export const projects: Project[] = [
     name: "Kira AI",
     tagline: "WhatsApp-native banking platform.",
     description:
-      "Banking that meets people where they already are. Kira lets users open accounts, send money, and pay bills entirely through WhatsApp — no app install, no friction. Co-founded and built the platform from zero — application architecture, cloud infrastructure on AWS, payment integrations, and the operational tooling that keeps it all running.",
+      "Banking that meets people where they already are. Kira lets users open accounts, send money, and pay bills entirely through WhatsApp. No app install, no friction. Co-founded and built the platform from zero, owning application architecture, cloud infrastructure on AWS, payment integrations, and the operational tooling that keeps it all running.",
     status: "in-production",
     role: "Co-Founder & CTO",
     metrics: [
@@ -76,9 +76,9 @@ export const projects: Project[] = [
   {
     slug: "y-queue",
     name: "Y-Queue?",
-    tagline: "Social-feed food delivery — acquired.",
+    tagline: "Social-feed food delivery. Acquired.",
     description:
-      "Not your regular ordering app — food delivery reimagined as social media. Think TikTok meets Uber Eats: food videos, likes, comments and restaurant pages drove discovery; tap a dish you want, place the order, drivers deliver in real time. I co-founded and led backend: the social graph and feed ranking, order routing, payment splits, dispatch, and the operational tooling that kept the marketplace running. Three hard problems in one product — content, marketplace, logistics. Successfully acquired.",
+      "Not your regular ordering app. Food delivery reimagined as social media. Think TikTok meets Uber Eats: food videos, likes, comments and restaurant pages drove discovery; tap a dish you want, place the order, drivers deliver in real time. I co-founded and led backend: the social graph and feed ranking, order routing, payment splits, dispatch, and the operational tooling that kept the marketplace running. Three hard problems in one product: content, marketplace, logistics. Successfully acquired.",
     status: "acquired",
     metrics: [
       "4,000+ users",

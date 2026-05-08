@@ -34,12 +34,6 @@ const certs: Cert[] = [
     issuer: "HashiCorp",
     badge: "/certs/terraform-associate.png",
   },
-  {
-    name: "Kubernetes & Cloud Native Associate (KCNA)",
-    date: "2026",
-    issuer: "CNCF",
-    badge: "/certs/kcna.png",
-  },
 ];
 
 export default function Certifications() {
@@ -50,7 +44,7 @@ export default function Certifications() {
         title="Certifications"
         description="Proof of work at the platforms I deploy to every day."
       />
-      <ul className="mt-12 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-12 grid gap-3 md:grid-cols-3">
         {certs.map((c) => {
           const cardClass =
             "group relative flex h-full items-start gap-4 rounded-lg border border-card-border bg-card-bg p-5 transition-all duration-200 hover:border-accent hover:bg-background-elevated hover:-translate-y-0.5";
