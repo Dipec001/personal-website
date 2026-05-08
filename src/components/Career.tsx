@@ -26,7 +26,7 @@ const roles: Role[] = [
     start: "Oct 2025",
     end: "Present",
     blurb:
-      "Building WhatsApp-native banking from zero. 7,500+ users, ₦280M+ processed in production across 5 payment rails.",
+      "Built WhatsApp-native banking from zero. End-to-end ownership: application architecture, AWS cloud infrastructure, payment rails, and the operational tooling. 9,000+ users, ₦519M+ processed across 5 payment rails.",
     status: "current",
     images: [
       {

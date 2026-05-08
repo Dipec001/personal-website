@@ -28,8 +28,8 @@ export default function AboutPage() {
             Hey, I&apos;m Divine.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-muted">
-            DevOps & Backend Engineer. Currently Co-Founder & CTO at Kira AI
-            and Senior DevOps Engineer at Travi Mobile. Based in Lagos.
+            DevOps & Backend Engineer. Co-Founder & CTO at Kira AI. Senior
+            DevOps Engineer at Travi Mobile. Based in Nigeria.
           </p>
         </div>
         <div className="relative aspect-[3/4] w-full max-w-[200px] overflow-hidden rounded-2xl border border-card-border-strong shadow-2xl shadow-black/40 sm:max-w-[180px]">
@@ -51,7 +51,7 @@ export default function AboutPage() {
         </h2>
         <div className="mt-6 space-y-5 text-base leading-relaxed text-foreground/85">
           <p>
-            I started building things in Lagos, the way most engineers here
+            I started building things in Nigeria, the way most engineers here
             start — figure out what&apos;s possible, then ship it before
             it&apos;s polished.
           </p>
@@ -60,7 +60,7 @@ export default function AboutPage() {
             — Computer &amp; Electronics Engineering. The years after were
             contract work, slowly figuring out what kind of engineer I wanted
             to be: the one who builds things that survive contact with real
-            users.
+            users — and runs the infrastructure they live on.
           </p>
           <p>
             In late 2023 I co-founded{" "}
@@ -80,11 +80,13 @@ export default function AboutPage() {
           <p>
             Late 2025 I co-founded <strong className="text-foreground">Kira AI</strong>
             {" "}— WhatsApp-native banking. Send money, pay bills, manage
-            accounts, all inside a chat. No app install, no friction. As CTO, I
-            built the platform from zero. Today: 7,500+ users, ₦280M+ processed
-            across five payment rails. Around the same time I joined Travi
-            Mobile as a DevOps Engineer; was promoted to Senior three months
-            later.
+            accounts, all inside a chat. No app install, no friction. As CTO I
+            designed the platform from zero — application architecture, cloud
+            infrastructure on AWS, payment integrations, and the operational
+            tooling that keeps it all running. Today: 9,000+ users, ₦519M+
+            processed across five payment rails. Around the same time I joined
+            Travi Mobile as a DevOps Engineer running production Kubernetes on
+            AWS EKS; promoted to Senior three months later.
           </p>
           <p>
             Outside of that, I write. Two ongoing series —{" "}
@@ -149,7 +151,7 @@ export default function AboutPage() {
         </h2>
         <div className="mt-6 space-y-5 text-base leading-relaxed text-foreground/85">
           <p>
-            Currently Co-Founder &amp; CTO at Kira AI.{" "}
+            Co-Founder &amp; CTO at Kira AI.{" "}
             <strong className="text-foreground">
               I&apos;m happy to talk to teams working on:
             </strong>
@@ -171,7 +173,7 @@ export default function AboutPage() {
             </li>
           </ul>
           <p>
-            Based in Lagos. Remote-first or relocation to{" "}
+            Based in Nigeria. Remote-first or relocation to{" "}
             <strong className="text-foreground">
               Dubai, Germany, or Ireland
             </strong>{" "}

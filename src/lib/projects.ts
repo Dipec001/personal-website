@@ -53,12 +53,12 @@ export const projects: Project[] = [
     name: "Kira AI",
     tagline: "WhatsApp-native banking platform.",
     description:
-      "Banking that meets people where they already are. Kira lets users open accounts, send money, and pay bills entirely through WhatsApp — no app install, no friction. Co-founded and built the platform from zero.",
+      "Banking that meets people where they already are. Kira lets users open accounts, send money, and pay bills entirely through WhatsApp — no app install, no friction. Co-founded and built the platform from zero — application architecture, cloud infrastructure on AWS, payment integrations, and the operational tooling that keeps it all running.",
     status: "in-production",
     role: "Co-Founder & CTO",
     metrics: [
-      "7,500+ users onboarded",
-      "₦280M+ processed in production",
+      "9,000+ users onboarded",
+      "₦519M+ processed in production",
       "Integrated 5 payment rails",
     ],
     stack: [
