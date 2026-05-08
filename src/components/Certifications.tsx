@@ -30,7 +30,7 @@ const certs: Cert[] = [
   },
   {
     name: "HashiCorp Terraform Associate",
-    date: "2026",
+    date: "May 2026",
     issuer: "HashiCorp",
     badge: "/certs/terraform-associate.png",
   },
