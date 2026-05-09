@@ -33,6 +33,8 @@ const certs: Cert[] = [
     date: "May 2026",
     issuer: "HashiCorp",
     badge: "/certs/terraform-associate.png",
+    verifyUrl:
+      "https://www.credly.com/badges/0cec883c-7223-4ce7-ac50-a138bb5b8309/public_url",
   },
 ];
 
