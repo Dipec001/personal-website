@@ -1,0 +1,114 @@
+---
+title: "Cost Explorer Shows $800/Month in Data Transfer You Can't Explain. Look Here First."
+description: "Most teams pay NAT Gateway data-processing charges on S3 traffic without realizing it. The fix is an S3 Gateway Endpoint, and it's free."
+date: "2026-05-09"
+series: "aws-daily-with-divine"
+tags: ["aws", "vpc", "cost-optimization", "nat-gateway", "s3", "networking"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-devops-cloudengineering-share-7459275467699687424-_lnk"
+---
+
+Most of us provision a **NAT Gateway** when we need our applications and instances in private subnets to reach the internet for updates, dependencies, and other AWS resources. That's what NAT Gateway was built for. It works well.
+
+But NAT Gateway charges you in two ways:
+
+1. An **hourly rate** just for having it provisioned (~$0.045/hr, roughly $33/month per AZ)
+2. A **data-processing rate** of $0.045/GB on every byte that flows through it
+
+The hourly cost is predictable. The data-processing cost is where bills explode silently.
+
+## Where the cost hides
+
+If your instances in private subnets are constantly talking to S3 — pulling images, reading configs, writing logs, restoring backups — **every single one of those requests is going through your NAT Gateway**. And you're paying $0.045/GB on all of it.
+
+S3 traffic through NAT adds up fast and is completely invisible until you get the bill. A workload pulling 500GB/day from S3 through NAT costs **$675/month** in data-processing charges alone, before the NAT Gateway hourly fee. Multiply that across multiple AZs and multiple workloads and that's how you get to $800/month in unexplained data transfer.
+
+## The fix: S3 Gateway Endpoint
+
+A **Gateway Endpoint** is a separate route that lets instances in private subnets talk directly to S3 or DynamoDB **over the AWS network** without touching your NAT Gateway at all.
+
+- **It's free.** No hourly charge, no data-processing charge.
+- **It only applies to S3 and DynamoDB.** All other internet-bound traffic still routes through the NAT Gateway.
+- Same private subnet. Same S3 access. Zero NAT charges for that traffic.
+
+## Setup via AWS CLI
+
+```bash
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-abcd1234 \
+  --service-name com.amazonaws.us-east-1.s3 \
+  --vpc-endpoint-type Gateway \
+  --route-table-ids rtb-private-1 rtb-private-2
+```
+
+Use your **private subnet** route table IDs — not the public ones. AWS automatically adds a route pointing S3 prefix-list traffic to the endpoint.
+
+For DynamoDB, same flow, different service name:
+
+```bash
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-abcd1234 \
+  --service-name com.amazonaws.us-east-1.dynamodb \
+  --vpc-endpoint-type Gateway \
+  --route-table-ids rtb-private-1 rtb-private-2
+```
+
+## Setup via Terraform
+
+```hcl
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = aws_route_table.private[*].id
+
+  tags = {
+    Name = "s3-gateway-endpoint"
+  }
+}
+```
+
+No security groups to manage. No DNS to configure. Gateway Endpoints are dead simple.
+
+## Verifying it's working
+
+After applying, confirm your private route tables have a new entry pointing to the endpoint:
+
+```bash
+aws ec2 describe-route-tables \
+  --route-table-ids rtb-private-1 \
+  --query 'RouteTables[*].Routes[?starts_with(GatewayId, `vpce-`)]'
+```
+
+You should see a route with a `DestinationPrefixListId` (the S3 service prefix list) pointing at your VPC endpoint ID (`vpce-xxxxxxxx`).
+
+To confirm traffic is actually bypassing NAT, check NAT Gateway metrics in CloudWatch after a day of normal traffic:
+
+```bash
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/NATGateway \
+  --metric-name BytesOutToDestination \
+  --dimensions Name=NatGatewayId,Value=nat-xxxxxxxx \
+  --start-time 2026-05-08T00:00:00Z \
+  --end-time 2026-05-09T00:00:00Z \
+  --period 3600 \
+  --statistics Sum
+```
+
+You should see a noticeable drop in `BytesOutToDestination` once S3 traffic is bypassing NAT.
+
+## What about other AWS services?
+
+Gateway Endpoints only work for S3 and DynamoDB. For everything else — SQS, SNS, KMS, Secrets Manager, CloudWatch Logs — you'd use **Interface Endpoints** instead, which cost $0.01/hr per AZ plus $0.01/GB data processing. Still meaningfully cheaper than NAT for high-volume services, but not free.
+
+## Cost recap
+
+| Path | Hourly | Data processing |
+|---|---|---|
+| NAT Gateway | $0.045/hr | **$0.045/GB** |
+| **S3 Gateway Endpoint** | **$0** | **$0** |
+
+> If you haven't checked whether you have an S3 Gateway Endpoint configured today, you might be paying for something that should cost you nothing.
+
+---
+
+Have you caught one of these silent NAT bills? What did it cost you?
