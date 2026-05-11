@@ -16,6 +16,16 @@ const geistMono = Geist_Mono({
 
 const SITE_URL = "https://divinechukwu.com";
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Divine Chukwu",
+  alternateName: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
+  url: SITE_URL,
+  author: { "@type": "Person", name: "Divine Chukwu" },
+  publisher: { "@type": "Person", name: "Divine Chukwu" },
+};
+
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -149,6 +159,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
