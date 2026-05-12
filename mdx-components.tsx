@@ -65,6 +65,28 @@ const components: MDXComponents = {
     </pre>
   ),
   hr: () => <hr className="my-10 border-card-border" />,
+  table: ({ children }) => (
+    <div className="my-6 overflow-x-auto rounded-lg border border-card-border">
+      <table className="w-full border-collapse text-sm">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="bg-card-bg border-b border-card-border-strong">
+      {children}
+    </thead>
+  ),
+  tbody: ({ children }) => (
+    <tbody className="divide-y divide-card-border">{children}</tbody>
+  ),
+  tr: ({ children }) => <tr>{children}</tr>,
+  th: ({ children }) => (
+    <th className="px-4 py-3 text-left font-semibold text-foreground">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="px-4 py-3 align-top text-foreground/85">{children}</td>
+  ),
 };
 
 export function useMDXComponents(): MDXComponents {
