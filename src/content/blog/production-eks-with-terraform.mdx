@@ -1,0 +1,187 @@
+---
+title: "I Built a Production-Shaped EKS Cluster with Terraform. Here's Everything That Bit Me."
+description: "From-scratch EKS with Terraform. Subnet placement, OIDC + IRSA, cross-account ENIs, and the two settings that hide until kubectl times out from your laptop."
+date: "2026-05-12"
+series: "k8s-with-divine"
+tags: ["aws", "eks", "terraform", "iac", "kubernetes"]
+linkedinUrl: ""
+---
+
+I set up a Kubernetes cluster on AWS EKS using nothing but Terraform — no clicking through the console, no `eksctl`, no shortcuts. Infrastructure as code only. Here's what I built, every decision I made, every mistake I hit, and why it matters.
+
+## Why Terraform and Not the Console
+
+Because clicking through a console doesn't scale, doesn't version, and doesn't teach you what's actually being created. With Terraform, everything is code. You can tag it, destroy it, replicate it across environments, and feed outputs from one module directly into another. When I run `terraform destroy`, the entire cluster (VPC, subnets, NAT gateway, IAM roles, node group, KMS key) disappears cleanly. Try doing that with a console-built cluster without spending an hour hunting down orphaned resources.
+
+Also: IaC is a single source of truth. Someone asks "what's in our cluster?" and you point at the repo, not someone's memory.
+
+## Why Modules Instead of Raw Resources
+
+Nobody writes `aws_eks_cluster`, `aws_iam_role`, `aws_iam_role_policy_attachment`, `aws_iam_openid_connect_provider`, `aws_security_group`, `aws_security_group_rule` (ten of them), `aws_kms_key`, `aws_launch_template`... from scratch in production anymore.
+
+The EKS module I used created **61 resources**. Getting each of those right from scratch matters: wrong IAM trust policy means nodes can't join the cluster. Wrong security group rules means the kubelet can't reach the API server. Missing OIDC provider means no IRSA (more on that below). These are the details that are easy to get wrong and painful to debug at 2am.
+
+Modules encode production-grade defaults. You still need to understand what they create. **Always read the full `terraform plan` output before applying**, line by line. But you're not writing it from scratch.
+
+The modules I used: `terraform-aws-modules/eks/aws` v21.20.0 and `terraform-aws-modules/vpc/aws` v6.6.1.
+
+## Why I Created My Own VPC
+
+The default VPC in every AWS account exists for quick experimentation. It's not built for EKS. It has no private subnets, no NAT gateway, no EKS-specific subnet tags, and it's shared across everything in the account.
+
+I created a dedicated VPC because:
+
+- I can tag it (owner, environment, managed-by-terraform)
+- I can destroy it cleanly with the cluster
+- I can control the network architecture exactly
+- The VPC module outputs feed directly into the EKS module — `module.vpc.private_subnets` goes straight into `subnet_ids`. No hardcoded IDs, no manual copy-paste.
+
+## The Network Architecture
+
+```text
+VPC: 10.0.0.0/16
+│
+├── us-east-1a
+│   ├── Public subnet  (10.0.2.0/24) → Internet Gateway
+│   └── Private subnet (10.0.0.0/24) → NAT Gateway
+│
+└── us-east-1b
+    ├── Public subnet  (10.0.3.0/24) → Internet Gateway
+    └── Private subnet (10.0.1.0/24) → same NAT Gateway
+```
+
+**Worker nodes live in private subnets.** They reach the internet (for pulling images, AWS API calls, etc.) via the NAT gateway, not directly. This means nodes aren't publicly addressable — better security posture.
+
+**Load balancers live in public subnets.** When you expose a service externally, the ALB sits in the public subnet and routes traffic to pods in private subnets.
+
+**Two AZs.** If us-east-1a has an outage, the nodes in us-east-1b keep running. For active-active production you'd go multi-region. For this lab, two AZs covers the core HA story.
+
+## The NAT Gateway Decision: One vs Per-AZ
+
+I provisioned a single shared NAT gateway. In production, you'd want one per AZ.
+
+**Why one per AZ in production:**
+
+AWS charges for NAT gateway in two ways: per hour ($0.045/hr) and per GB of data processed ($0.045/GB). Cross-AZ data transfer adds another $0.01/GB on top of that. When a node in us-east-1b routes outbound traffic through a NAT sitting in us-east-1a, that's cross-AZ traffic. At low volume it's invisible. At scale it's a real line item.
+
+One NAT per AZ keeps traffic local. No cross-AZ charges at all.
+
+**Also: resilience.** With one NAT in us-east-1a, if that AZ goes down, nodes in us-east-1b lose internet access even though their AZ is fine. One NAT per AZ eliminates that dependency.
+
+For this lab: one NAT saves ~$32/month. It's a lab I'm destroying today. Cost wins.
+
+## EKS Control Plane: The Key Mental Model Shift
+
+If you're coming from CKA labs, your mental model has a control plane node you can SSH into, etcd you back up manually, and `kubectl get nodes` that shows the control plane node in the list.
+
+EKS is different. **The control plane is invisible.** AWS runs etcd, kube-apiserver, kube-controller-manager, and kube-scheduler in their own managed infrastructure — not in your AWS account, not in your VPC. You never SSH into it. You never back up etcd. AWS handles it multi-AZ by default. That's what the $0.10/hr buys.
+
+What you get is an endpoint URL (something like `https://3C0...EF.gr7.us-east-1.eks.amazonaws.com`). Your kubectl talks to that endpoint. Same API, same commands, same objects. The control plane is just someone else's problem.
+
+`kubectl get nodes` shows **only worker nodes**. The control plane never appears.
+
+## Worker Nodes: Managed Node Groups
+
+I used a managed node group with 2 × t3.medium instances. With managed node groups, AWS handles launching EC2 instances, replacing unhealthy ones, and rolling AMI updates — but the instances live in your account, in your VPC.
+
+The module block:
+
+```hcl
+eks_managed_node_groups = {
+  node_group_1 = {
+    desired_size   = 2
+    min_size       = 1
+    max_size       = 3
+    instance_types = ["t3.medium"]
+  }
+}
+```
+
+The module automatically creates: an IAM role for the nodes, three IAM policy attachments (`AmazonEKSWorkerNodePolicy`, `AmazonEKS_CNI_Policy`, `AmazonEC2ContainerRegistryReadOnly`), and a launch template. All wired together correctly.
+
+## Subnet Mistake: Worker Nodes in the Wrong Place
+
+My first attempt put worker nodes in public subnets:
+
+```hcl
+subnet_ids = module.vpc.public_subnets
+```
+
+EKS rejected it immediately:
+
+```text
+Ec2SubnetInvalidConfiguration: does not automatically assign public IP addresses
+```
+
+Nodes in public subnets need public IPs to function. The VPC module doesn't enable this by default on public subnets.
+
+The fix:
+
+```hcl
+subnet_ids = module.vpc.private_subnets
+```
+
+Nodes reach internet via the NAT gateway. This is also the right production pattern — nodes shouldn't be publicly addressable.
+
+The `subnet_ids` parameter controls two things: where worker nodes launch, and where AWS creates the **cross-account ENIs**. The cross-account ENIs are the network bridge between the AWS-managed control plane and your VPC. They're how the managed control plane talks to your kubelet. Private subnets are the right home for both.
+
+## OIDC Provider and IRSA
+
+The module automatically created an OIDC provider (`aws_iam_openid_connect_provider`). This is the foundation of **IRSA — IAM Roles for Service Accounts**.
+
+Without IRSA, giving a pod AWS permissions means either:
+
+- Mounting static credentials in a Kubernetes Secret. Dangerous — credentials can leak.
+- Attaching an IAM role to the node. Too broad — every pod on the node inherits all permissions.
+
+With IRSA, each Kubernetes service account gets its own IAM role with precise permissions. You annotate the service account:
+
+```yaml
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-role
+```
+
+The role's trust policy trusts the cluster's OIDC provider. When a pod using that service account starts, it gets a projected token. It exchanges that token with AWS STS via the OIDC trust and gets temporary, scoped credentials.
+
+No static secrets. No overprivileged nodes. Just IAM, scoped per workload.
+
+## Two Settings You Must Add for kubectl to Work from Outside
+
+Two non-default settings blocked me from using kubectl from my laptop.
+
+**1. `endpoint_public_access = true`**
+
+The module defaults to `false` — the cluster API server is only accessible from within the VPC. From your laptop, the DNS resolves to a private IP and you get a connection timeout. Set this to true to expose the endpoint publicly (still protected by IAM auth).
+
+**2. `enable_cluster_creator_admin_permissions = true`**
+
+By default, the IAM identity that creates the cluster via Terraform doesn't automatically get kubectl access. You have to explicitly grant it. This adds an EKS access entry (the modern replacement for the aws-auth ConfigMap) for the Terraform user.
+
+Without both, `kubectl get nodes` either times out or returns a credentials error.
+
+## What the Terraform Plan Taught Me
+
+Before running `terraform apply`, I ran `terraform plan` and read every resource. The plan showed 61 resources across: VPC (subnets, route tables, NAT, IGW, EIPs, associations), EKS control plane (IAM roles, security groups, KMS key, CloudWatch log group, OIDC provider), and node group (IAM role, 3 policy attachments, launch template, node group itself).
+
+Reading the plan before applying is non-negotiable. The module is creating resources on your behalf. You need to know what they are. When something breaks, you need to know what exists so you can reason about what went wrong.
+
+> "I used a module" is a junior answer. "I used a module, read the plan, and can tell you every resource it creates and why" is a senior answer.
+
+## The Final State
+
+```text
+VPC + 4 subnets + NAT + IGW           ✓
+EKS control plane                      ✓
+Managed node group                     ✓
+kubectl authenticated and talking      ✓
+kubectl get ns → default, kube-node-lease, kube-public, kube-system  ✓
+```
+
+All infrastructure defined in code. Taggable. Destroyable. Replicable.
+
+Next: install ArgoCD on the cluster and wire it to this repo for GitOps. Then deploy a real application through it.
+
+---
+
+Code: [github.com/Dipec001/infra-labs](https://github.com/Dipec001/infra-labs)
