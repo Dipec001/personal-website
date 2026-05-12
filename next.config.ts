@@ -15,7 +15,7 @@ const withMDX = createMDX({
         {
           theme: "github-dark-default",
           keepBackground: false,
-          defaultLang: "plaintext",
+          defaultLang: { block: "plaintext" },
         },
       ],
     ],
