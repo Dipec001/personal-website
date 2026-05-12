@@ -1,6 +1,6 @@
 ---
 title: "VPC Peering Configured. Route Tables Look Correct. Instances Still Can't Communicate."
-description: "Four things must be in place for VPC peering to actually work — and the most common culprit by far is the second one."
+description: "Four things must be in place for VPC peering to actually work, and the most common culprit by far is the second one."
 date: "2026-04-02"
 series: "aws-daily-with-divine"
 tags: ["aws", "vpc", "networking", "troubleshooting"]
@@ -18,7 +18,7 @@ aws ec2 describe-vpc-peering-connections \
   --filters Name=status-code,Values=active
 ```
 
-## 2. Route tables must be updated on BOTH sides — this is where most people get stuck
+## 2. Route tables must be updated on BOTH sides, this is where most people get stuck
 
 Creating the peering connection **doesn't automatically add routes.** You have to:
 
@@ -29,7 +29,7 @@ Most engineers add it on one side and forget the other. Traffic goes one way but
 
 ## 3. Security groups must allow traffic from the other VPC's CIDR range
 
-Your security group on the receiving instance needs an inbound rule allowing traffic from the **other VPC's IP range** — not just from its own VPC.
+Your security group on the receiving instance needs an inbound rule allowing traffic from the **other VPC's IP range**, not just from its own VPC.
 
 ## 4. NACLs must allow traffic in both directions
 
@@ -39,9 +39,9 @@ NACLs are stateless. You need explicit **inbound AND outbound** rules for traffi
 
 > The peering connection exists, everything looks configured, but the route table on one side is incomplete and traffic has nowhere to go.
 
-It's number 2 — almost every time. The others tend to feel like common knowledge once you've seen them once. Routes are easy to miss because you're looking at the peering connection itself and not the route tables that have to actually use it.
+It's number 2, almost every time. The others tend to feel like common knowledge once you've seen them once. Routes are easy to miss because you're looking at the peering connection itself and not the route tables that have to actually use it.
 
-A 30-second verification — list all routes targeting peering connections across the account:
+A 30-second verification, list all routes targeting peering connections across the account:
 
 ```bash
 aws ec2 describe-route-tables \

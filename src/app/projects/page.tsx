@@ -6,7 +6,7 @@ import { projects } from "@/lib/projects";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Production systems Divine Chukwu has built and shipped — uptime monitoring, fintech, and queue management.",
+    "Production systems Divine Chukwu has built and shipped, uptime monitoring, fintech, and queue management.",
 };
 
 export default function ProjectsPage() {

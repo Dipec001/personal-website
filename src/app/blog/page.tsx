@@ -6,7 +6,7 @@ import { SERIES, getAllPosts, getSeriesWithCounts } from "@/lib/blog";
 export const metadata: Metadata = {
   title: "Blog · AWS Daily with Divine, K8s with Divine, Notes",
   description:
-    "Writing from Divine Chukwu — AWS Daily with Divine, K8s with Divine, and long-form notes on building production systems.",
+    "Writing from Divine Chukwu, AWS Daily with Divine, K8s with Divine, and long-form notes on building production systems.",
 };
 
 function formatDate(iso: string) {
@@ -49,7 +49,7 @@ export default function BlogIndexPage() {
 
       {/* All posts list */}
       {posts.length === 0 ? (
-        <p className="mt-12 text-muted">No posts yet — check back soon.</p>
+        <p className="mt-12 text-muted">No posts yet, check back soon.</p>
       ) : (
         <ul className="mt-12 divide-y divide-card-border">
           {posts.map((p) => {

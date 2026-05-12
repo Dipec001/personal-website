@@ -10,14 +10,14 @@ export default function WaitlistForm() {
     e.preventDefault();
     if (!email) return;
     setStatus("submitting");
-    // No backend yet — this is UI-only as specified.
+    // No backend yet, this is UI-only as specified.
     setTimeout(() => setStatus("done"), 400);
   };
 
   if (status === "done") {
     return (
       <p className="text-sm text-foreground/85">
-        Got it — <span className="font-mono text-accent">{email}</span> is on the
+        Got it, <span className="font-mono text-accent">{email}</span> is on the
         list. Episode 1 lands first.
       </p>
     );

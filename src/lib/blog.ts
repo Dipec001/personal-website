@@ -16,14 +16,14 @@ export const SERIES: Record<SeriesSlug, Series> = {
     slug: "aws-daily-with-divine",
     name: "AWS Daily with Divine",
     description:
-      "Daily AWS scenarios from production. Real problems, real fixes — the practical knowledge AWS docs don't teach.",
+      "Daily AWS scenarios from production. Real problems, real fixes, the practical knowledge AWS docs don't teach.",
     tagline: "AWS Daily with Divine",
   },
   "k8s-with-divine": {
     slug: "k8s-with-divine",
     name: "K8s with Divine",
     description:
-      "Kubernetes deep dives covering the operational details most engineers miss — eviction order, resource requests, DaemonSets, and more.",
+      "Kubernetes deep dives covering the operational details most engineers miss, eviction order, resource requests, DaemonSets, and more.",
     tagline: "K8s with Divine",
   },
   notes: {

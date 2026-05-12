@@ -15,7 +15,7 @@ Here's what is actually happening.
 
 When Auto Scaling launches a new instance, by default it immediately marks it as `InService` and the load balancer starts sending traffic to it.
 
-But the instance might not actually be ready yet. The OS is still booting. Your application is still starting up. Dependencies are still loading. **Requests hit it before it can handle them properly**, which causes errors and slow responses — even though Auto Scaling is doing exactly what you configured it to do.
+But the instance might not actually be ready yet. The OS is still booting. Your application is still starting up. Dependencies are still loading. **Requests hit it before it can handle them properly**, which causes errors and slow responses, even though Auto Scaling is doing exactly what you configured it to do.
 
 Auto Scaling working correctly and your application being ready are two different things.
 
@@ -33,7 +33,7 @@ Only when your script signals **ready** does Auto Scaling move the instance to `
 
 ## Concrete numbers
 
-Say your application takes 3 minutes to fully initialize — loading config, connecting to the database, warming the cache.
+Say your application takes 3 minutes to fully initialize, loading config, connecting to the database, warming the cache.
 
 | Without lifecycle hook | With lifecycle hook |
 |---|---|
@@ -63,7 +63,7 @@ aws autoscaling complete-lifecycle-action \
   --instance-id "$INSTANCE_ID"
 ```
 
-`ABANDON` as the default result is a deliberate choice — if your script never signals ready before the timeout, the instance is removed instead of taking traffic. Fail closed, not fail open.
+`ABANDON` as the default result is a deliberate choice, if your script never signals ready before the timeout, the instance is removed instead of taking traffic. Fail closed, not fail open.
 
 ---
 

@@ -7,7 +7,7 @@ tags: ["kubernetes", "scheduling", "production", "resource-management"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7445017252145385472-i0E9"
 ---
 
-Resource requests should be standard practice for anyone running workloads on Kubernetes — unless you're running applications that can withstand unexpected downtime.
+Resource requests should be standard practice for anyone running workloads on Kubernetes, unless you're running applications that can withstand unexpected downtime.
 
 ## What requests actually do
 
@@ -23,7 +23,7 @@ So if a node has 4GB of memory and your pods have requests totaling 3.8GB, the s
 
 ## What happens without requests: noisy neighbors
 
-Without requests, the scheduler has no information to make good placement decisions. So it places pods blindly — and one greedy pod can take down everything on that node.
+Without requests, the scheduler has no information to make good placement decisions. So it places pods blindly, and one greedy pod can take down everything on that node.
 
 These are called **noisy neighbors.**
 
@@ -35,7 +35,7 @@ Here's what that looks like in practice. A node with 4GB of memory and three pod
 
 Pod A's bad behavior affected every workload sharing that node.
 
-## Requests aren't the full picture — limits matter too
+## Requests aren't the full picture, limits matter too
 
 Requests are what the scheduler uses for placement. **Limits** are the ceiling a pod cannot exceed. A pod can use more than its request, but never more than its limit.
 
@@ -43,7 +43,7 @@ Without limits, a pod can consume everything available on the node.
 
 | When you hit | What happens |
 |---|---|
-| **CPU limit** | Pod gets throttled silently — slows down but keeps running |
+| **CPU limit** | Pod gets throttled silently, slows down but keeps running |
 | **Memory limit** | Pod gets `OOMKilled` immediately, no warning |
 
 ## Setting both properly

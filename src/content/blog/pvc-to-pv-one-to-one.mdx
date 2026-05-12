@@ -1,5 +1,5 @@
 ---
-title: "PVC to PV Is a One-to-One Relationship — Here's What That Means in Production"
+title: "PVC to PV Is a One-to-One Relationship, Here's What That Means in Production"
 description: "Two storage behaviors catch people completely off guard in production: the sizing trap, and the Released state trap. Know both before they bite you."
 date: "2026-04-03"
 series: "k8s-with-divine"
@@ -7,7 +7,7 @@ tags: ["kubernetes", "storage", "persistent-volumes", "cka"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7442843004928933888-aSmS"
 ---
 
-PVs and PVCs — fully known as **Persistent Volumes** and **Persistent Volume Claims** — are storage volumes allocated for your cluster, and claims for those storage volumes by your workloads.
+PVs and PVCs, fully known as **Persistent Volumes** and **Persistent Volume Claims**, are storage volumes allocated for your cluster, and claims for those storage volumes by your workloads.
 
 But if that's all you know about them, you're in for trouble sooner or later.
 
@@ -19,7 +19,7 @@ Say you have a 100GB PV and you create a PVC requesting 10GB. Kubernetes binds t
 
 Now that **entire 100GB PV is locked to your 10GB claim** and no other PVC can use the remaining 90GB. It's completely unavailable to the rest of the cluster.
 
-So you can have a situation where you have plenty of storage provisioned but new PVCs can't bind — because every PV is already claimed, even if most of that storage is sitting unused.
+So you can have a situation where you have plenty of storage provisioned but new PVCs can't bind, because every PV is already claimed, even if most of that storage is sitting unused.
 
 > PVC ⟷ PV is one-to-one. Not one-to-storage-by-size.
 
@@ -27,9 +27,9 @@ So you can have a situation where you have plenty of storage provisioned but new
 
 There are three reclaim policies you need to know:
 
-- **Retain** — when the PVC is deleted, the PV stays but enters `Released` state and **cannot be claimed by another PVC**.
-- **Delete** — the PV is also deleted when the PVC is deleted.
-- **Recycle** — the PV is wiped and made `Available` again for a new claim. (Deprecated, don't rely on it.)
+- **Retain**, when the PVC is deleted, the PV stays but enters `Released` state and **cannot be claimed by another PVC**.
+- **Delete**, the PV is also deleted when the PVC is deleted.
+- **Recycle**, the PV is wiped and made `Available` again for a new claim. (Deprecated, don't rely on it.)
 
 `Retain` is the most common in production because you don't want storage silently deleted. But here's where most engineers get caught.
 

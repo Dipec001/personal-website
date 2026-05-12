@@ -1,6 +1,6 @@
 ---
 title: "The First Thing I Check When a Pod Is in CrashLoopBackOff. It's Not the Logs."
-description: "Logs only help if the app started long enough to produce output. The exit code tells you why it died at the OS level — before logs even existed."
+description: "Logs only help if the app started long enough to produce output. The exit code tells you why it died at the OS level, before logs even existed."
 date: "2026-03-22"
 series: "k8s-with-divine"
 tags: ["kubernetes", "debugging", "production", "incident-response"]
@@ -11,7 +11,7 @@ linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-
 
 ## Why logs are the wrong first step
 
-When a pod crashes, `kubectl logs` shows you the application output — **but only if the application actually started and produced output.** If it crashed before producing anything, logs are empty and useless.
+When a pod crashes, `kubectl logs` shows you the application output, **but only if the application actually started and produced output.** If it crashed before producing anything, logs are empty and useless.
 
 The **exit code** tells you why the process died at the OS level, before the app even had a chance to log anything.
 
@@ -22,12 +22,12 @@ The **exit code** tells you why the process died at the OS level, before the app
 | **0** | Process exited cleanly, no error. Usually a misconfigured command that completes and exits instead of running continuously. |
 | **1** | Application error. Something in your code crashed. **Now** you go check logs. |
 | **137** | `OOMKilled`. Container exceeded its memory limit and the kernel killed it. Logs won't tell you this as clearly or as fast. |
-| **139** | Segfault. Something in the binary crashed at the C level — common with native dependencies built for the wrong architecture. |
+| **139** | Segfault. Something in the binary crashed at the C level, common with native dependencies built for the wrong architecture. |
 | **143** | Container received `SIGTERM` and didn't shut down in time. Usually missing graceful-shutdown handling. |
 
 ## My debugging order
 
-1. `kubectl describe pod <pod-name>` — check the **Events** section and the **exit code** under `Last State`
+1. `kubectl describe pod <pod-name>`, check the **Events** section and the **exit code** under `Last State`
 2. The exit code tells me the **category** of failure
 3. *Then* I decide whether logs are even worth checking
 

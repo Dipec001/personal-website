@@ -10,7 +10,7 @@ export default function Writing() {
       <SectionHeading
         eyebrow="Writing"
         title="Three series, one mission."
-        description="I publish what I learn from running production systems — the practical knowledge that doesn't show up in docs."
+        description="I publish what I learn from running production systems, the practical knowledge that doesn't show up in docs."
       />
 
       <div className="mt-12 grid gap-4 lg:grid-cols-3">

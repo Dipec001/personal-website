@@ -1,13 +1,13 @@
 ---
 title: "CloudWatch Alarms Are Firing. You Open the Dashboard and See Nothing."
-description: "Three reasons your alarm fired without leaving evidence on the metric graph — and why ignoring them trains engineers to stop taking alarms seriously."
+description: "Three reasons your alarm fired without leaving evidence on the metric graph, and why ignoring them trains engineers to stop taking alarms seriously."
 date: "2026-04-10"
 series: "aws-daily-with-divine"
 tags: ["aws", "cloudwatch", "observability", "incident-response"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_aws-cloudwatch-devops-activity-7445379592715976704-r72m"
 ---
 
-Ever been in this situation? You set an alarm. It fires. You open CloudWatch, check the metric — and the graph looks completely normal. No spike, no anomaly, nothing that explains why the alarm fired. You scroll back in time too. Still nothing.
+Ever been in this situation? You set an alarm. It fires. You open CloudWatch, check the metric, and the graph looks completely normal. No spike, no anomaly, nothing that explains why the alarm fired. You scroll back in time too. Still nothing.
 
 There are many reasons this can happen. Here are three I have seen come up repeatedly.
 
@@ -17,7 +17,7 @@ Your alarm is watching one specific metric, but the dashboard is displaying a di
 
 For example: the alarm monitors a specific Lambda function's error rate. But the dashboard shows the **average** error rate **across all functions.** The spike on one function becomes invisible when averaged across many. You're looking at the right place, but the wrong view.
 
-A useful sanity check — pull the alarm's exact statistic and compare it to your dashboard:
+A useful sanity check, pull the alarm's exact statistic and compare it to your dashboard:
 
 ```bash
 aws cloudwatch describe-alarms \
@@ -29,19 +29,19 @@ If that returns `Statistic: Sum` and your dashboard is showing `Average`, you've
 
 ## 2. Service went down completely and stopped publishing metrics
 
-CloudWatch fired because of **missing data** — and the alarm did its job. But there's nothing to see on the metric graph because nothing was being published during that period.
+CloudWatch fired because of **missing data**, and the alarm did its job. But there's nothing to see on the metric graph because nothing was being published during that period.
 
-In this case, **don't look at the metric. Look at your service health directly.** A pod that crashed, a Lambda that stopped being invoked, an ECS task that disappeared — the alarm caught the silence, not a spike.
+In this case, **don't look at the metric. Look at your service health directly.** A pod that crashed, a Lambda that stopped being invoked, an ECS task that disappeared, the alarm caught the silence, not a spike.
 
 ## 3. Composite alarm misconfiguration
 
-A composite alarm combines multiple underlying alarms. One of those underlying alarms fired briefly and recovered within seconds — triggering the composite. By the time you open the dashboard, everything is green again and the moment has passed.
+A composite alarm combines multiple underlying alarms. One of those underlying alarms fired briefly and recovered within seconds, triggering the composite. By the time you open the dashboard, everything is green again and the moment has passed.
 
 Set retention or notification on the underlying alarms, not just the composite, so you can see what actually fired.
 
 ## Why this matters more than it looks
 
-> Alarms that fire without a clear cause train engineers to stop taking them seriously — and that is exactly when a real incident gets missed.
+> Alarms that fire without a clear cause train engineers to stop taking them seriously, and that is exactly when a real incident gets missed.
 
 The cost of a noisy alarm isn't the noise. It's the muscle memory it builds.
 

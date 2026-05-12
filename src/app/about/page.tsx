@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <article className="mx-auto max-w-3xl px-6 py-20">
-      {/* Header — intro + portrait */}
+      {/* Header, intro + portrait */}
       <header className="grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-accent">

@@ -19,7 +19,7 @@ A few years back, I finished working on a small feature for an order system. Ran
 
 Something broke.
 
-I rolled back immediately, thinking I had missed something in the pipeline — but that made things worse. The deployment had already run database migrations, and rolling back the code doesn't roll back the database. At least not in any straightforward way.
+I rolled back immediately, thinking I had missed something in the pipeline, but that made things worse. The deployment had already run database migrations, and rolling back the code doesn't roll back the database. At least not in any straightforward way.
 
 No immediate complaints came in from users, and that was only because the discovery was fast. Unconventional, but I discovered the break because I was hungry and decided to place an order myself. To my greatest dismay, it failed.
 
@@ -33,14 +33,14 @@ If I had asked myself those four questions before deploying, I would have recogn
 
 - **What fails if this breaks?** Order placement.
 - **Who is affected?** Every customer trying to buy anything.
-- **How fast can we detect it?** Without proactive monitoring on order success rate, we'd find out from users — too slow.
+- **How fast can we detect it?** Without proactive monitoring on order success rate, we'd find out from users, too slow.
 - **How fast can we recover?** With a non-trivial schema migration in flight, rollback is not free. The path back to a healthy state is hours, not minutes.
 
 That recognition alone changes the deploy plan. Feature flag from the start. Forward-only migration. Pre-deploy alerts on order success rate. A quick recovery script staged and ready.
 
 ## What I do now
 
-I ask the four questions before every deploy. And just as importantly — **I make sure my setup can answer them accurately too.** A question you can't answer with data is just a vibe.
+I ask the four questions before every deploy. And just as importantly, **I make sure my setup can answer them accurately too.** A question you can't answer with data is just a vibe.
 
 Experience really is an excellent teacher.
 

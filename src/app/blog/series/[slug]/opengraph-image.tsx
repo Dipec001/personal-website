@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { SERIES, type SeriesSlug, getPostsBySeries } from "@/lib/blog";
 
-export const alt = "Divine Chukwu — Blog series";
+export const alt = "Divine Chukwu · Blog series";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

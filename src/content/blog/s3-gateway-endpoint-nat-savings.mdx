@@ -18,7 +18,7 @@ The hourly cost is predictable. The data-processing cost is where bills explode 
 
 ## Where the cost hides
 
-If your instances in private subnets are constantly talking to S3 — pulling images, reading configs, writing logs, restoring backups — **every single one of those requests is going through your NAT Gateway**. And you're paying $0.045/GB on all of it.
+If your instances in private subnets are constantly talking to S3, pulling images, reading configs, writing logs, restoring backups, **every single one of those requests is going through your NAT Gateway**. And you're paying $0.045/GB on all of it.
 
 S3 traffic through NAT adds up fast and is completely invisible until you get the bill. A workload pulling 500GB/day from S3 through NAT costs **$675/month** in data-processing charges alone, before the NAT Gateway hourly fee. Multiply that across multiple AZs and multiple workloads and that's how you get to $800/month in unexplained data transfer.
 
@@ -40,7 +40,7 @@ aws ec2 create-vpc-endpoint \
   --route-table-ids rtb-private-1 rtb-private-2
 ```
 
-Use your **private subnet** route table IDs — not the public ones. AWS automatically adds a route pointing S3 prefix-list traffic to the endpoint.
+Use your **private subnet** route table IDs, not the public ones. AWS automatically adds a route pointing S3 prefix-list traffic to the endpoint.
 
 For DynamoDB, same flow, different service name:
 
@@ -98,7 +98,7 @@ You should see a noticeable drop in `BytesOutToDestination` once S3 traffic is b
 
 ## What about other AWS services?
 
-Gateway Endpoints only work for S3 and DynamoDB. For everything else — SQS, SNS, KMS, Secrets Manager, CloudWatch Logs — you'd use **Interface Endpoints** instead, which cost $0.01/hr per AZ plus $0.01/GB data processing. Still meaningfully cheaper than NAT for high-volume services, but not free.
+Gateway Endpoints only work for S3 and DynamoDB. For everything else, SQS, SNS, KMS, Secrets Manager, CloudWatch Logs, you'd use **Interface Endpoints** instead, which cost $0.01/hr per AZ plus $0.01/GB data processing. Still meaningfully cheaper than NAT for high-volume services, but not free.
 
 ## Cost recap
 

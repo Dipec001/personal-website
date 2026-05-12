@@ -11,7 +11,7 @@ Experience is the best teacher, and this is one of those things you really only 
 
 ## What actually happens during failover
 
-When the RDS primary instance fails, AWS promotes the standby to primary, and **that part is actually fast — usually 60 to 120 seconds.**
+When the RDS primary instance fails, AWS promotes the standby to primary, and **that part is actually fast, usually 60 to 120 seconds.**
 
 The way your application finds the new primary is through DNS. RDS gives you one endpoint, and during failover AWS updates that DNS record to point to the new primary. On paper this sounds seamless. In practice, three things quietly extend your recovery time well beyond your SLA.
 
@@ -25,7 +25,7 @@ Your application server (or the network layer between it and RDS) caches the old
 
 ### 2. Application not configured to retry on connection failure
 
-After failover, existing database connections drop. If your application doesn't have retry logic built in, it just fails and returns errors to users — instead of automatically reconnecting to the new primary.
+After failover, existing database connections drop. If your application doesn't have retry logic built in, it just fails and returns errors to users, instead of automatically reconnecting to the new primary.
 
 A simple retry decorator in Python:
 

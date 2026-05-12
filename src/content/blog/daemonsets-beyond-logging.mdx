@@ -1,13 +1,13 @@
 ---
-title: "DaemonSets Aren't Just for Logging — Three Production Use Cases"
-description: "Most engineers think DaemonSets are for logs. They're for any node-level concern — monitoring, network policy, runtime security."
+title: "DaemonSets Aren't Just for Logging, Three Production Use Cases"
+description: "Most engineers think DaemonSets are for logs. They're for any node-level concern, monitoring, network policy, runtime security."
 date: "2026-04-11"
 series: "k8s-with-divine"
 tags: ["kubernetes", "daemonsets", "monitoring", "security"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7445741927666266112-NlJI"
 ---
 
-Most engineers only think of DaemonSets when they need to collect logs. But the guarantee a DaemonSet provides — **exactly one pod on every node, automatically, even when new nodes join** — is useful for anything that needs to operate at the node level across your entire cluster.
+Most engineers only think of DaemonSets when they need to collect logs. But the guarantee a DaemonSet provides, **exactly one pod on every node, automatically, even when new nodes join**, is useful for anything that needs to operate at the node level across your entire cluster.
 
 Here are three production use cases that actually matter.
 
@@ -17,19 +17,19 @@ Every node has its own CPU, memory, disk, and network metrics. If you want to mo
 
 One agent per node is the right architecture because each agent is responsible for exactly one node's worth of data. If you had two agents on one node and zero on another, your monitoring would be uneven and incomplete.
 
-DaemonSets guarantee the one-per-node distribution automatically — even when new nodes are added. Tools like **Prometheus Node Exporter** use DaemonSets for exactly this reason.
+DaemonSets guarantee the one-per-node distribution automatically, even when new nodes are added. Tools like **Prometheus Node Exporter** use DaemonSets for exactly this reason.
 
 ## 2. Network policy enforcement
 
 Network policies in Kubernetes are enforced by the **CNI plugin** running on each node. Whether it's Calico, Cilium, or Flannel, the CNI plugin needs to be present on every single node to enforce the rules about which pods can talk to which.
 
-If a node doesn't have the CNI plugin running, pods on that node bypass your network policies entirely — and that's a serious security hole.
+If a node doesn't have the CNI plugin running, pods on that node bypass your network policies entirely, and that's a serious security hole.
 
 The CNI plugin is deployed as a DaemonSet so enforcement is guaranteed on every node in your cluster.
 
 ## 3. Runtime security scanning
 
-Tools like **Falco** run as DaemonSets to monitor system calls on every node in real time. They watch for suspicious behavior — a container trying to access sensitive files, a process spawning an unexpected shell.
+Tools like **Falco** run as DaemonSets to monitor system calls on every node in real time. They watch for suspicious behavior, a container trying to access sensitive files, a process spawning an unexpected shell.
 
 You need one per node because each instance can only see the system calls happening on its own node.
 
@@ -41,8 +41,8 @@ kubectl get daemonsets --all-namespaces
 
 You'll likely see your CNI, `kube-proxy`, and any monitoring agents (Node Exporter, Datadog, etc.). If you're running EKS, you'll also see `aws-node` and `vpc-cni`.
 
-If you see fewer than expected, that's worth a look — the absence of a DaemonSet on a node usually means whatever it was doing isn't happening there.
+If you see fewer than expected, that's worth a look, the absence of a DaemonSet on a node usually means whatever it was doing isn't happening there.
 
 ---
 
-Have you been using DaemonSets for any of these purposes — or others? Let's hear it.
+Have you been using DaemonSets for any of these purposes, or others? Let's hear it.

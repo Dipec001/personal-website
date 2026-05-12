@@ -20,7 +20,7 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Divine Chukwu",
-  alternateName: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
+  alternateName: "Divine Chukwu · DevOps, Backend & Cloud Engineer",
   url: SITE_URL,
   author: { "@type": "Person", name: "Divine Chukwu" },
   publisher: { "@type": "Person", name: "Divine Chukwu" },
@@ -35,7 +35,7 @@ const personSchema = {
   image: `${SITE_URL}/me.jpeg`,
   jobTitle: "DevOps, Backend & Cloud Engineer",
   description:
-    "DevOps, Backend & Cloud Engineer. Co-Founder & CTO at Kira AI. Builds production systems that actually work — cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
+    "DevOps, Backend & Cloud Engineer. Co-Founder & CTO at Kira AI. Builds production systems that actually work, cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   email: "mailto:divine@divinechukwu.com",
   sameAs: [
     "https://www.linkedin.com/in/divine-chukwu-63bb04145/",
@@ -108,11 +108,11 @@ const personSchema = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
+    default: "Divine Chukwu · DevOps, Backend & Cloud Engineer",
     template: "%s · Divine Chukwu",
   },
   description:
-    "Divine Chukwu builds production systems that actually work — cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
+    "Divine Chukwu builds production systems that actually work, cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   keywords: [
     "Divine Chukwu",
     "DevOps Engineer",
@@ -135,13 +135,13 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "Divine Chukwu",
-    title: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
+    title: "Divine Chukwu · DevOps, Backend & Cloud Engineer",
     description:
       "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Divine Chukwu — DevOps, Backend & Cloud Engineer",
+    title: "Divine Chukwu · DevOps, Backend & Cloud Engineer",
     description:
       "I build production systems that actually work. Cloud infrastructure, payment platforms, and the unsexy plumbing that keeps the lights on.",
     creator: "@dipec_pascal",

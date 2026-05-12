@@ -10,7 +10,7 @@ export default function TechVerse() {
             Coming soon
           </p>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            TechVerse — Kubernetes Explained Through Story.
+            TechVerse · Kubernetes Explained Through Story.
           </h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted">
             A new way to learn Kubernetes through a cinematic city universe.

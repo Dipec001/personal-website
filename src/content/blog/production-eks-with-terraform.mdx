@@ -7,7 +7,7 @@ tags: ["aws", "eks", "terraform", "iac", "kubernetes"]
 linkedinUrl: ""
 ---
 
-I set up a Kubernetes cluster on AWS EKS using nothing but Terraform — no clicking through the console, no `eksctl`, no shortcuts. Infrastructure as code only. Here's what I built, every decision I made, every mistake I hit, and why it matters.
+I set up a Kubernetes cluster on AWS EKS using nothing but Terraform, no clicking through the console, no `eksctl`, no shortcuts. Infrastructure as code only. Here's what I built, every decision I made, every mistake I hit, and why it matters.
 
 ## Why Terraform and Not the Console
 
@@ -34,7 +34,7 @@ I created a dedicated VPC because:
 - I can tag it (owner, environment, managed-by-terraform)
 - I can destroy it cleanly with the cluster
 - I can control the network architecture exactly
-- The VPC module outputs feed directly into the EKS module — `module.vpc.private_subnets` goes straight into `subnet_ids`. No hardcoded IDs, no manual copy-paste.
+- The VPC module outputs feed directly into the EKS module, `module.vpc.private_subnets` goes straight into `subnet_ids`. No hardcoded IDs, no manual copy-paste.
 
 ## The Network Architecture
 
@@ -50,7 +50,7 @@ VPC: 10.0.0.0/16
     └── Private subnet (10.0.1.0/24) → same NAT Gateway
 ```
 
-**Worker nodes live in private subnets.** They reach the internet (for pulling images, AWS API calls, etc.) via the NAT gateway, not directly. This means nodes aren't publicly addressable — better security posture.
+**Worker nodes live in private subnets.** They reach the internet (for pulling images, AWS API calls, etc.) via the NAT gateway, not directly. This means nodes aren't publicly addressable, better security posture.
 
 **Load balancers live in public subnets.** When you expose a service externally, the ALB sits in the public subnet and routes traffic to pods in private subnets.
 
@@ -74,7 +74,7 @@ For this lab: one NAT saves ~$32/month. It's a lab I'm destroying today. Cost wi
 
 If you're coming from CKA labs, your mental model has a control plane node you can SSH into, etcd you back up manually, and `kubectl get nodes` that shows the control plane node in the list.
 
-EKS is different. **The control plane is invisible.** AWS runs etcd, kube-apiserver, kube-controller-manager, and kube-scheduler in their own managed infrastructure — not in your AWS account, not in your VPC. You never SSH into it. You never back up etcd. AWS handles it multi-AZ by default. That's what the $0.10/hr buys.
+EKS is different. **The control plane is invisible.** AWS runs etcd, kube-apiserver, kube-controller-manager, and kube-scheduler in their own managed infrastructure, not in your AWS account, not in your VPC. You never SSH into it. You never back up etcd. AWS handles it multi-AZ by default. That's what the $0.10/hr buys.
 
 What you get is an endpoint URL (something like `https://3C0...EF.gr7.us-east-1.eks.amazonaws.com`). Your kubectl talks to that endpoint. Same API, same commands, same objects. The control plane is just someone else's problem.
 
@@ -82,7 +82,7 @@ What you get is an endpoint URL (something like `https://3C0...EF.gr7.us-east-1.
 
 ## Worker Nodes: Managed Node Groups
 
-I used a managed node group with 2 × t3.medium instances. With managed node groups, AWS handles launching EC2 instances, replacing unhealthy ones, and rolling AMI updates — but the instances live in your account, in your VPC.
+I used a managed node group with 2 × t3.medium instances. With managed node groups, AWS handles launching EC2 instances, replacing unhealthy ones, and rolling AMI updates, but the instances live in your account, in your VPC.
 
 The module block:
 
@@ -121,18 +121,18 @@ The fix:
 subnet_ids = module.vpc.private_subnets
 ```
 
-Nodes reach internet via the NAT gateway. This is also the right production pattern — nodes shouldn't be publicly addressable.
+Nodes reach internet via the NAT gateway. This is also the right production pattern, nodes shouldn't be publicly addressable.
 
 The `subnet_ids` parameter controls two things: where worker nodes launch, and where AWS creates the **cross-account ENIs**. The cross-account ENIs are the network bridge between the AWS-managed control plane and your VPC. They're how the managed control plane talks to your kubelet. Private subnets are the right home for both.
 
 ## OIDC Provider and IRSA
 
-The module automatically created an OIDC provider (`aws_iam_openid_connect_provider`). This is the foundation of **IRSA — IAM Roles for Service Accounts**.
+The module automatically created an OIDC provider (`aws_iam_openid_connect_provider`). This is the foundation of **IRSA, IAM Roles for Service Accounts**.
 
 Without IRSA, giving a pod AWS permissions means either:
 
-- Mounting static credentials in a Kubernetes Secret. Dangerous — credentials can leak.
-- Attaching an IAM role to the node. Too broad — every pod on the node inherits all permissions.
+- Mounting static credentials in a Kubernetes Secret. Dangerous, credentials can leak.
+- Attaching an IAM role to the node. Too broad, every pod on the node inherits all permissions.
 
 With IRSA, each Kubernetes service account gets its own IAM role with precise permissions. You annotate the service account:
 
@@ -152,7 +152,7 @@ Two non-default settings blocked me from using kubectl from my laptop.
 
 **1. `endpoint_public_access = true`**
 
-The module defaults to `false` — the cluster API server is only accessible from within the VPC. From your laptop, the DNS resolves to a private IP and you get a connection timeout. Set this to true to expose the endpoint publicly (still protected by IAM auth).
+The module defaults to `false`, the cluster API server is only accessible from within the VPC. From your laptop, the DNS resolves to a private IP and you get a connection timeout. Set this to true to expose the endpoint publicly (still protected by IAM auth).
 
 **2. `enable_cluster_creator_admin_permissions = true`**
 

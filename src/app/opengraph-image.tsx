@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export const alt = "Divine Chukwu — DevOps, Backend & Cloud Engineer";
+export const alt = "Divine Chukwu · DevOps, Backend & Cloud Engineer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -26,7 +26,7 @@ export default async function OpenGraphImage() {
           color: "#ededed",
         }}
       >
-        {/* Left column — text */}
+        {/* Left column · text */}
         <div
           style={{
             flex: 1,
@@ -95,7 +95,7 @@ export default async function OpenGraphImage() {
           </div>
         </div>
 
-        {/* Right column — photo */}
+        {/* Right column · photo */}
         <div
           style={{
             display: "flex",

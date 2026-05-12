@@ -1,35 +1,35 @@
 ---
 title: "Kubernetes Will Evict Your Pods in a Specific Order"
-description: "Most engineers think it's random. It's not. Pod eviction order is determined by QoS class — and it decides what gets killed first when a node runs out of resources."
+description: "Most engineers think it's random. It's not. Pod eviction order is determined by QoS class, and it decides what gets killed first when a node runs out of resources."
 date: "2026-04-15"
 series: "k8s-with-divine"
 tags: ["kubernetes", "qos", "production"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-activity-7449745161535840256-tr1p"
 ---
 
-Have you ever had your node resources exhausted and watched some of your workloads get evicted? Many assume it's random — that Kubernetes just picks pods arbitrarily. It's very far from that.
+Have you ever had your node resources exhausted and watched some of your workloads get evicted? Many assume it's random, that Kubernetes just picks pods arbitrarily. It's very far from that.
 
 Kubernetes has a specific eviction order determined by something called a **QoS class**. It's a property automatically assigned when the pod is created and visible under the `status` section of the pod. You never set it directly. Kubernetes assigns it based on how you configured your resource requests and limits.
 
 ## The three QoS classes
 
-### Guaranteed — last to be evicted
+### Guaranteed, last to be evicted
 
 A pod gets this class when **both requests and limits are set, and they are equal to each other**.
 
 Kubernetes treats these as highest priority because the pod made a precise promise about what it needs and is held to exactly that. No more, no less.
 
-### Burstable — evicted second
+### Burstable, evicted second
 
 A pod gets this class when it has at least one container with a memory or CPU request or limit set, but doesn't meet the criteria for Guaranteed.
 
 These pods have made some promises, but not tight ones.
 
-### BestEffort — evicted first
+### BestEffort, evicted first
 
 No resource requests or limits set at all.
 
-Kubernetes treats these as lowest priority because they made no promises about what they need — so they're the first to go when the node is under pressure. A pod gets BestEffort if it doesn't meet the criteria for either Guaranteed or Burstable.
+Kubernetes treats these as lowest priority because they made no promises about what they need, so they're the first to go when the node is under pressure. A pod gets BestEffort if it doesn't meet the criteria for either Guaranteed or Burstable.
 
 ## Eviction order
 
@@ -55,7 +55,7 @@ If most of your critical workloads come back as `BestEffort`, that's the answer 
 
 ## What to actually do
 
-For workloads you want least interrupted, always set both requests and limits — and **make them equal if the workload is critical.** That's the difference between a pod that survives a node under memory pressure and one that gets killed first.
+For workloads you want least interrupted, always set both requests and limits, and **make them equal if the workload is critical.** That's the difference between a pod that survives a node under memory pressure and one that gets killed first.
 
 ---
 
