@@ -1,7 +1,7 @@
 ---
 title: "Upgrading Kubernetes in Production Without Downtime. The Order of Operations Is Everything."
 description: "The commands are the easy part. Sequencing them so workloads stay live is what matters. Pre-flight checks, control plane first, drain with PDBs, plus the gotchas managed-K8s docs leave out."
-date: "2026-05-13"
+date: "2026-05-14"
 series: "k8s-with-divine"
 tags: ["kubernetes", "k8s", "production", "upgrade", "kubeadm", "pod-disruption-budget", "eks"]
 linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-share-7459357259249201154-2Xz1"
@@ -26,7 +26,7 @@ Before you touch anything:
    ```bash
    pluto detect-helm --target-versions k8s=v1.30.0
    ```
-3. **Back up etcd.** I've blogged about the routine separately — if you haven't taken a fresh snapshot, do it now. Upgrades that go sideways without a snapshot are how you end up restoring from yesterday.
+3. **Back up etcd.** I've blogged the [routine separately](/blog/etcd-backup-routine). If you haven't taken a fresh snapshot, do it now. Upgrades that go sideways without a snapshot are how you end up restoring from yesterday.
 4. **Audit your PodDisruptionBudgets.** Run `kubectl get pdb --all-namespaces`. Anything with `minAvailable: 100%` on a single-replica workload will block your drain forever.
 5. **Verify cluster health.** `kubectl get nodes` should show every node Ready. `kubectl get pods --all-namespaces` should show no pods in `CrashLoopBackOff`. Don't upgrade on top of a broken cluster.
 6. **Confirm CNI compatibility.** Calico, Cilium, and Weave each have their own version compatibility matrices. Check before you upgrade, not during.
@@ -84,7 +84,7 @@ sudo kubeadm upgrade node
 
 This upgrades the local control plane components on that node without re-running cluster-wide upgrade tasks. Then upgrade kubelet/kubectl on each in the same way.
 
-## Worker nodes — one at a time
+## Worker nodes, one at a time
 
 For each worker node, this is the loop. Do not parallelize.
 
@@ -161,7 +161,7 @@ Most readers operate managed clusters, not bare `kubeadm`. The principles are id
 
 - **EKS**: control plane upgraded via console, `eksctl upgrade cluster`, or Terraform `cluster_version`. AWS handles the control plane skew. **You still own the node group upgrades.** Use rolling node group upgrades or, better, blue-green node groups (provision the new version next to the old, drain old, decommission).
 - **GKE**: node pool surge upgrades. Set `maxSurge` and `maxUnavailable` based on your headroom and PDB tolerance.
-- **AKS**: similar — `az aks nodepool upgrade` with surge configuration.
+- **AKS**: similar, with `az aks nodepool upgrade` and surge configuration.
 
 The "control plane first, workers second" rule still holds. Managed providers enforce it; you can't upgrade workers ahead of the control plane even if you wanted to.
 
