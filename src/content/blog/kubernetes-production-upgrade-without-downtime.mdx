@@ -1,0 +1,186 @@
+---
+title: "Upgrading Kubernetes in Production Without Downtime. The Order of Operations Is Everything."
+description: "The commands are the easy part. Sequencing them so workloads stay live is what matters. Pre-flight checks, control plane first, drain with PDBs, plus the gotchas managed-K8s docs leave out."
+date: "2026-05-13"
+series: "k8s-with-divine"
+tags: ["kubernetes", "k8s", "production", "upgrade", "kubeadm", "pod-disruption-budget", "eks"]
+linkedinUrl: "https://www.linkedin.com/posts/divine-chukwu-63bb04145_kubernetes-devops-k8s-share-7459357259249201154-2Xz1"
+---
+
+It's one thing to upgrade a cluster. It's another thing entirely to upgrade it without causing downtime. If you're running production workloads and need to upgrade, the commands are the easy part. **The order of operations is what actually matters.**
+
+## Two rules before anything else
+
+**You cannot skip minor versions.** Upgrade one minor at a time, 1.28 to 1.29 to 1.30. Never 1.28 to 1.30 directly. The skew policy permits the kubelet to be at most one minor version behind the API server, and `kubeadm` enforces this on apply.
+
+**Control plane first, worker nodes second. Always.** The API server must be at the new version before any kubelets on worker nodes move. Never the other way around.
+
+With those locked in, here's the rest of the process.
+
+## Pre-flight checklist (the part most upgrade guides skip)
+
+Before you touch anything:
+
+1. **Read the release notes.** Every minor version deprecates or removes APIs. The `policy/v1beta1` PodDisruptionBudget removal in 1.25 broke a lot of clusters that didn't read the notes. Don't be that cluster.
+2. **Scan for deprecated APIs in your manifests.** Use `pluto` or `kubectl deprecations` to find resources still using removed APIs:
+   ```bash
+   pluto detect-helm --target-versions k8s=v1.30.0
+   ```
+3. **Back up etcd.** I've blogged about the routine separately — if you haven't taken a fresh snapshot, do it now. Upgrades that go sideways without a snapshot are how you end up restoring from yesterday.
+4. **Audit your PodDisruptionBudgets.** Run `kubectl get pdb --all-namespaces`. Anything with `minAvailable: 100%` on a single-replica workload will block your drain forever.
+5. **Verify cluster health.** `kubectl get nodes` should show every node Ready. `kubectl get pods --all-namespaces` should show no pods in `CrashLoopBackOff`. Don't upgrade on top of a broken cluster.
+6. **Confirm CNI compatibility.** Calico, Cilium, and Weave each have their own version compatibility matrices. Check before you upgrade, not during.
+
+## The actual process — control plane first
+
+Update the package repository to the new minor version, then on the first control plane node:
+
+```bash
+# Find the exact patch version available
+sudo apt update
+sudo apt-cache madison kubeadm | head -5
+
+# Upgrade kubeadm
+sudo apt-mark unhold kubeadm
+sudo apt install -y kubeadm=1.30.0-00
+sudo apt-mark hold kubeadm
+
+# Verify the new version
+kubeadm version
+
+# See what the upgrade will do
+sudo kubeadm upgrade plan
+
+# Apply it (only on the first control plane node)
+sudo kubeadm upgrade apply v1.30.0
+```
+
+`kubeadm upgrade apply` upgrades the control plane components (api-server, controller-manager, scheduler, etcd). It does not touch kubelet on the host. That's a separate step:
+
+```bash
+# Drain the control plane node
+kubectl drain <cp-node> --ignore-daemonsets
+
+# Upgrade kubelet and kubectl
+sudo apt-mark unhold kubelet kubectl
+sudo apt install -y kubelet=1.30.0-00 kubectl=1.30.0-00
+sudo apt-mark hold kubelet kubectl
+
+# Restart kubelet
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+# Uncordon
+kubectl uncordon <cp-node>
+```
+
+## For HA control planes (multiple CP nodes)
+
+On the first control plane, run `kubeadm upgrade apply` as above. On every other control plane node, use the lighter `upgrade node` command instead:
+
+```bash
+sudo kubeadm upgrade node
+```
+
+This upgrades the local control plane components on that node without re-running cluster-wide upgrade tasks. Then upgrade kubelet/kubectl on each in the same way.
+
+## Worker nodes — one at a time
+
+For each worker node, this is the loop. Do not parallelize.
+
+```bash
+# (from the control plane) drain the worker
+kubectl drain <worker-node> --ignore-daemonsets --delete-emptydir-data
+
+# (on the worker) upgrade kubeadm
+sudo apt-mark unhold kubeadm
+sudo apt install -y kubeadm=1.30.0-00
+sudo apt-mark hold kubeadm
+
+# (on the worker) upgrade the local node config
+sudo kubeadm upgrade node
+
+# (on the worker) upgrade kubelet and kubectl
+sudo apt-mark unhold kubelet kubectl
+sudo apt install -y kubelet=1.30.0-00 kubectl=1.30.0-00
+sudo apt-mark hold kubelet kubectl
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+# (from the control plane) uncordon
+kubectl uncordon <worker-node>
+```
+
+Wait until the node is `Ready` and pods have rescheduled before moving to the next one. Rushing this is how you end up with no available capacity and pods stuck in `Pending`.
+
+## Why draining matters
+
+Draining gracefully evicts pods and marks the node unschedulable so new pods won't land on it during the upgrade. Without draining you risk pods being killed mid-request. The drain triggers your deployments to reschedule replicas onto other nodes before the kubelet restart yanks them.
+
+This is where **PodDisruptionBudgets** earn their keep.
+
+## PDBs are what actually protect your workloads
+
+If you have a PDB requiring a minimum of 2 replicas, the drain process respects that and won't evict pods that would violate it. The drain command will block and wait rather than force the eviction.
+
+If that happens, you have two options:
+
+- **Wait** for pods to reschedule onto other nodes naturally as the upgrade progresses. Once enough replicas exist elsewhere, the drain will complete.
+- Use `--disable-eviction` to bypass PDB checks entirely. **This defeats the purpose of having a PDB** and risks your availability guarantees. Only do this if you fully understand the consequences, and ideally never on a real production upgrade.
+
+> A drain that blocks because of a PDB is not a problem. It's a sign your cluster is well configured and your availability guarantees are working exactly as designed.
+
+The PDB anti-pattern to fix before upgrading: a `minAvailable: 100%` budget on a deployment with a single replica. That combination means **no pod from that workload can ever be evicted**, including by a drain. The drain blocks forever. Either raise replicas or relax the PDB before you start.
+
+## Observability during the upgrade
+
+Run these in separate terminals while the upgrade is going:
+
+```bash
+# Watch nodes
+kubectl get nodes -w
+
+# Watch pod movement and evictions
+kubectl get pods --all-namespaces -w
+
+# Watch events for the cluster
+kubectl get events --all-namespaces --watch
+```
+
+On the application side, keep eyes on:
+
+- Per-service error rates and p99 latency in Prometheus / Datadog
+- Ingress 5xx counts
+- Anything alerting on SLO burn rate
+
+If a service's error rate spikes during a drain, that's your signal that the workload's PDB or replica count is too thin for production traffic. Pause the upgrade, fix the deployment, and resume.
+
+## On managed Kubernetes (EKS, GKE, AKS)
+
+Most readers operate managed clusters, not bare `kubeadm`. The principles are identical but the mechanics shift:
+
+- **EKS**: control plane upgraded via console, `eksctl upgrade cluster`, or Terraform `cluster_version`. AWS handles the control plane skew. **You still own the node group upgrades.** Use rolling node group upgrades or, better, blue-green node groups (provision the new version next to the old, drain old, decommission).
+- **GKE**: node pool surge upgrades. Set `maxSurge` and `maxUnavailable` based on your headroom and PDB tolerance.
+- **AKS**: similar — `az aks nodepool upgrade` with surge configuration.
+
+The "control plane first, workers second" rule still holds. Managed providers enforce it; you can't upgrade workers ahead of the control plane even if you wanted to.
+
+## A word on rollback
+
+Kubernetes does not support downgrading the control plane. `kubeadm upgrade apply` is one-way. If a control plane upgrade goes wrong mid-stream, your rollback is **restore etcd from the snapshot you took in the pre-flight checklist.**
+
+This is why the pre-flight etcd backup is non-negotiable. The "we'll just roll it back" plan does not exist for K8s control plane upgrades.
+
+## Recap
+
+1. Read the release notes. Scan for deprecated APIs. Back up etcd.
+2. Control plane first. `kubeadm upgrade apply` on the first CP, `kubeadm upgrade node` on the rest.
+3. Drain each node before upgrading kubelet on it. Uncordon after.
+4. Workers one at a time. Never in parallel.
+5. PDBs are protecting you when drains block. Don't bypass them.
+6. Watch nodes, pods, events, and SLO metrics throughout.
+7. Rollback is etcd-snapshot restore. Have the snapshot.
+
+---
+
+What's the most painful upgrade you've shipped? Did the drain block, or did something else surprise you?
